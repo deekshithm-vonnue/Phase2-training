@@ -1,16 +1,16 @@
-import { readTasks, saveTasks } from "./storage.js";
-import type { Task } from "./types/types.js";
+import { readTasks, saveTasks } from "./storage.ts";
+import type { Task } from "./types/types.ts";
 
-export async function addTask(description: string): Promise<void> {
+export async function addTask(title: string): Promise<void> {
   const tasks: Task[] = await readTasks();
   const newTask: Task = {
     id: tasks.length + 1,
-    description: description,
+    title: title,
     completed: false,
   };
   tasks.push(newTask);
   saveTasks(tasks);
-  console.log(`Task ${description} added succesfully`);
+  console.log(`Task ${title} added succesfully`);
 }
 
 export async function deleteTask(id: number): Promise<void> {
@@ -21,7 +21,7 @@ export async function deleteTask(id: number): Promise<void> {
     return;
   }
   saveTasks(updateTasks);
-  console.log(`Task {id} deleted successfully`);
+  console.log(`Task ${id} deleted successfully`);
 }
 
 export async function completeTask(id: number) {
@@ -38,7 +38,7 @@ export async function completeTask(id: number) {
   console.log(`Task ${id} marked as completed`);
 }
 
-export async function filter(filter: string): Promise<void> {
+export async function filterTask(filter: string): Promise<void> {
   const tasks: Task[] = await readTasks();
   let filterTask: Task[] = [];
 
