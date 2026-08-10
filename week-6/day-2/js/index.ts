@@ -6,7 +6,6 @@ import {
   list,
 } from "./services.ts";
 
-//console.log(process.argv[2]);
 let operation = process.argv[2]?.toLowerCase();
 
 switch (operation) {
@@ -32,7 +31,7 @@ switch (operation) {
     completeTask(Number(process.argv[3]));
     break;
   case "filter":
-     if (!process.argv[3]) {
+    if (!process.argv[3]) {
       throw new Error("Provide the filter operation- completed or pending");
     }
     filterTask(process.argv[3] as string);

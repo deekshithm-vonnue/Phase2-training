@@ -1,5 +1,5 @@
-import { readTasks, saveTasks } from "./storage.ts";
-import type { Task } from "./types/types.ts";
+import { readTasks, saveTasks } from "./storage";
+import type { Task } from "../types/types.ts";
 
 export async function addTask(title: string): Promise<void> {
   const tasks: Task[] = await readTasks();
@@ -17,8 +17,7 @@ export async function deleteTask(id: number): Promise<void> {
   const tasks: Task[] = await readTasks();
   const updateTasks = tasks.filter((task) => task.id !== id);
   if (updateTasks.length === tasks.length) {
-    console.log("Task not found");
-    return;
+    throw new Error("Task not found");
   }
   saveTasks(updateTasks);
   console.log(`Task ${id} deleted successfully`);
@@ -28,10 +27,10 @@ export async function completeTask(id: number) {
   const tasks: Task[] = await readTasks();
   const task = tasks.find((task) => task.id === id);
   if (!task) {
-    console.log(`Task not found`);
-    return;
+    throw new Error(`Task not found`);
   } else if (task.completed === true) {
     console.log(`Task is already marked completed`);
+    return;
   }
   task.completed = true;
   saveTasks(tasks);
@@ -47,7 +46,8 @@ export async function filterTask(filter: string): Promise<void> {
   } else if (filter == "pending") {
     filterTask = tasks.filter((task) => !task.completed);
   } else {
-    console.log("Invaild filter operation");
+    console.log("Invalid filter operation");
+    return;
   }
   filterTask.forEach((task) => {
     console.log(task);

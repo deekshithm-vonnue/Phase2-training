@@ -1,21 +1,7 @@
 [
   {
     "id": 1,
-    "description": "create login page",
-    "completed": true
-  },
-  {
-    "id": 2,
-    "completed": false
-  },
-  {
-    "id": 3,
-    "description": "spa",
-    "completed": false
-  },
-  {
-    "id": 4,
-    "title": "spa",
+    "title": "create login page",
     "completed": false
   }
 ]
