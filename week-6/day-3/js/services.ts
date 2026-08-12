@@ -14,6 +14,7 @@ export async function addTask(title: string): Promise<void> {
 }
 
 export async function deleteTask(id: number): Promise<void> {
+  console.log(id)
   const tasks: Task[] = await readTasks();
   const updateTasks = tasks.filter((task) => task.id !== id);
   if (updateTasks.length === tasks.length) {

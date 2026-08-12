@@ -64,10 +64,10 @@ export async function removeTask(
     return;
   }
   try {
-    const task = await deleteTask(Number(id));
+    await deleteTask(Number(id));
     sendResponse.sucess(res, "Successfully deleted task", 200);
-  } catch (error) {
-    sendResponse.error(res, error as string, 404);
+  } catch (error:any) {
+    sendResponse.error(res, error.message as string, 404);
   }
 }
 
