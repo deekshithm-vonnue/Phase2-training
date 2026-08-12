@@ -4,11 +4,14 @@ import {
   completeTask,
   deleteTask,
   filterTask,
+  getTaskbyId,
   list,
+  updateTask,
 } from "../js/services";
 import { readTasks, saveTasks } from "../js/storage";
 import { Task } from "../types/types";
 import { after } from "node:test";
+import { update } from "../js/controller";
 
 jest.mock("../js/storage.js", () => ({
   readTasks: jest.fn(),
@@ -161,5 +164,63 @@ describe("filterTask validation", () => {
     await filterTask("pending");
     expect(logSpy).toHaveBeenCalledTimes(1);
     expect(logSpy).toHaveBeenCalledWith(intialTasks[0]);
+  });
+});
+
+describe("getTaskbyID validation", () => {
+  const mockReadTasks = readTasks as jest.Mock;
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+  test("should return task from array of task when it is called it that id", async () => {
+    const initialTasks = [
+      { id: 1, title: "create login page", completed: false },
+      { id: 2, title: "Implement Task Manger", completed: true },
+    ];
+    mockReadTasks.mockResolvedValue(initialTasks);
+    const task = await getTaskbyId(1);
+    expect(task).toEqual(initialTasks[0]);
+  });
+
+  test("should return null when it is called it id not in the array", async () => {
+    const initialTasks = [
+      { id: 1, title: "create login page", completed: false },
+      { id: 2, title: "Implement Task Manger", completed: true },
+    ];
+    expect(await getTaskbyId(3)).toBeUndefined();
+  });
+});
+
+describe("updateTask validation", () => {
+  let intialTasks: Task[];
+
+  const mockReadTasks = readTasks as jest.Mock;
+  const mockSaveTasks = saveTasks as jest.Mock;
+  beforeEach(() => {
+    intialTasks = [
+      { id: 1, title: "create login page", completed: false },
+      { id: 2, title: "Implement Task Manger", completed: true },
+    ];
+  });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should update the task in the array when it is called with an id and following changes", async () => {
+    mockReadTasks.mockResolvedValue(intialTasks);
+    const change = { title: "new updates", completed: true };
+    const id = 1;
+    await updateTask(id, change);
+    expect(mockSaveTasks).toHaveBeenCalledTimes(id);
+    const updatedTasks = mockSaveTasks.mock.calls[0][0] as Task[];
+    const task = updatedTasks.find((task) => task.id == id);
+    expect(task).toMatchObject(change);
+  });
+
+  test("should throw error when it is called with invaslid id", async () => {
+    mockReadTasks.mockResolvedValue(intialTasks);
+    const change = { title: "new updates", completed: true };
+    await expect(() => updateTask(6, change)).rejects.toThrow(/not/i);
   });
 });
