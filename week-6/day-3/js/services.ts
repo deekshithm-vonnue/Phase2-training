@@ -14,7 +14,7 @@ export async function addTask(title: string): Promise<void> {
 }
 
 export async function deleteTask(id: number): Promise<void> {
-  console.log(id)
+  console.log(id);
   const tasks: Task[] = await readTasks();
   const updateTasks = tasks.filter((task) => task.id !== id);
   if (updateTasks.length === tasks.length) {
@@ -74,7 +74,7 @@ export async function updateTask(id: number, change: Partial<Task>) {
     const updatedtask = { ...task, ...change };
     const index = tasks.indexOf(task);
     tasks[index] = updatedtask;
-    saveTasks(tasks);
+    await saveTasks(tasks);
   } else {
     throw new Error("Task not found");
   }

@@ -21,7 +21,7 @@ export const server = http.createServer((req, res) => {
   }
 
   //POST endpoint
-  else if (reqUrl.pathname == "/tasks5" && req.method === "POST") {
+  else if (reqUrl.pathname == "/tasks" && req.method === "POST") {
     console.log("Request type: " + req.method + "Endpoint: " + req.url);
     createTask(req, res);
   }

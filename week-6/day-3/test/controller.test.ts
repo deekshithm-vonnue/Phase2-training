@@ -1,10 +1,19 @@
 import request from "supertest";
-import { getAllTasks, getTask, removeTask } from "../js/controller";
+import {
+  createTask,
+  getAllTasks,
+  getRequestJSON,
+  getTask,
+  removeTask,
+  helpers,
+  update,
+} from "../js/controller";
 import { readTasks, saveTasks } from "../js/storage";
 import { Task } from "../types/types";
 import { sendResponse } from "../js/responseHelper";
 import { IncomingMessage, ServerResponse } from "node:http";
-import { deleteTask, getTaskbyId } from "../js/services";
+import { addTask, deleteTask, getTaskbyId, updateTask } from "../js/services";
+import { create } from "node:domain";
 
 jest.mock("../js/storage.ts", () => ({
   readTasks: jest.fn(),
@@ -16,7 +25,10 @@ jest.mock("../js/responseHelper.ts");
 jest.mock("../js/services", () => ({
   getTaskbyId: jest.fn(),
   deleteTask: jest.fn(),
+  addTask: jest.fn(),
+  updateTask: jest.fn(),
 }));
+
 describe("getAlltask validation", () => {
   const mockReadTasks = readTasks as jest.Mock;
   const mockSaveTasks = saveTasks as jest.Mock;
@@ -171,6 +183,99 @@ describe("removeTask", () => {
     expect(sendResponse.error).toHaveBeenCalledWith(
       mockRes,
       "Task not found",
+      404,
+    );
+  });
+});
+
+describe("createTask", () => {
+  const mockAddTask = addTask as jest.Mock;
+  let mockReq: Partial<IncomingMessage>, mockRes: Partial<ServerResponse>;
+  let spyGetRequestJSON: jest.SpyInstance;
+  beforeEach(() => {
+    mockReq = {};
+    mockRes = {};
+    spyGetRequestJSON = jest
+      .spyOn(helpers, "getRequestJSON")
+      .mockImplementation(jest.fn());
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
+
+  test("should reeturn 201 when task get created", async () => {
+    mockReq = { method: "POST", url: "/tasks" };
+    const body = { title: "create task manager" };
+
+    spyGetRequestJSON.mockResolvedValue(body);
+
+    await createTask(mockReq as IncomingMessage, mockRes as ServerResponse);
+    expect(mockAddTask).toHaveBeenCalled();
+    expect(sendResponse.sucess).toHaveBeenCalledTimes(1);
+    expect(sendResponse.sucess).toHaveBeenCalledWith(
+      mockRes,
+      "Task added successfully",
+      201,
+    );
+  });
+
+  test("should return 500 when getRequestJSON gets rejected", async () => {
+    mockReq = { method: "POST", url: "/tasks" };
+    spyGetRequestJSON.mockRejectedValue(null);
+    await createTask(mockReq as IncomingMessage, mockRes as ServerResponse);
+    expect(sendResponse.error).toHaveBeenCalledTimes(1);
+    expect(sendResponse.error).toHaveBeenCalledWith(
+      mockRes,
+      "Internal Server Error",
+      500,
+    );
+  });
+});
+
+describe("update", () => {
+  const mockUpdate = updateTask as jest.Mock;
+  let mockReq: Partial<IncomingMessage>, mockRes: Partial<ServerResponse>;
+  let spyGetRequestJSON: jest.SpyInstance;
+  beforeEach(() => {
+    mockReq = {};
+    mockRes = {};
+    spyGetRequestJSON = jest
+      .spyOn(helpers, "getRequestJSON")
+      .mockImplementation(jest.fn());
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
+
+  test("should reeturn 201 when task get created", async () => {
+    mockReq = { method: "PATCH", url: "/tasks/:1" };
+    const body = { title: "create task manager" };
+
+    spyGetRequestJSON.mockResolvedValue(body);
+
+    await update(mockReq as IncomingMessage, mockRes as ServerResponse);
+    expect(mockUpdate).toHaveBeenCalled();
+    expect(sendResponse.sucess).toHaveBeenCalledTimes(1);
+    expect(sendResponse.sucess).toHaveBeenCalledWith(
+      mockRes,
+      "Task updated successfully",
+      200,
+    );
+    expect(sendResponse.error).not.toHaveBeenCalled();
+  });
+
+  test("should return 500 when getRequestJSON gets rejected", async () => {
+    mockReq = { method: "PATCH", url: "/tasks/:1" };
+    spyGetRequestJSON.mockRejectedValue(new Error("Body is Empty"));
+    await update(mockReq as IncomingMessage, mockRes as ServerResponse);
+    expect(sendResponse.error).toHaveBeenCalledTimes(1);
+    expect(sendResponse.error).toHaveBeenCalledWith(
+      mockRes,
+      expect.any(Error),
       404,
     );
   });

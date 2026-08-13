@@ -1,8 +1,10 @@
 // import url from 'url'
+import { resolve } from "node:dns";
 import { sendResponse } from "./responseHelper.ts";
 import { addTask, deleteTask, getTaskbyId, updateTask } from "./services.ts";
 import { readTasks } from "./storage.ts";
 import { IncomingMessage, ServerResponse } from "node:http";
+import type { Task } from "../types/types.ts";
 // import { Task } from "../types/types.ts";
 export async function getAllTasks(
   req: IncomingMessage,
@@ -21,16 +23,9 @@ export async function createTask(
   res: ServerResponse,
 ): Promise<void> {
   try {
-    let body = "";
-    req.on("data", function (chunk) {
-      body += chunk.toString();
-    });
-
-    req.on("end", async function () {
-      const data = JSON.parse(body);
-      await addTask(data.title);
-      sendResponse.sucess(res, "Task added successfully", 201);
-    });
+    const data = await helpers.getRequestJSON(req);
+    await addTask(data.title);
+    sendResponse.sucess(res, "Task added successfully", 201);
   } catch (error) {
     sendResponse.error(res, "Internal Server Error", 500);
   }
@@ -66,7 +61,7 @@ export async function removeTask(
   try {
     await deleteTask(Number(id));
     sendResponse.sucess(res, "Successfully deleted task", 200);
-  } catch (error:any) {
+  } catch (error: any) {
     sendResponse.error(res, error.message as string, 404);
   }
 }
@@ -83,17 +78,26 @@ export async function update(
   }
 
   try {
-    let body = "";
-    req.on("data", function (chunk) {
-      body += chunk.toString();
-    });
-
-    req.on("end", async function () {
-      const data = JSON.parse(body);
-      await updateTask(Number(id), data);
-      sendResponse.sucess(res, "Task updated successfully", 200);
-    });
+    const data = await helpers.getRequestJSON(req);
+    await updateTask(Number(id), data);
+    sendResponse.sucess(res, "Task updated successfully", 200);
   } catch (error) {
     sendResponse.error(res, error as string, 404);
   }
 }
+
+export async function getRequestJSON(req: IncomingMessage): Promise<Task> {
+  let body = "";
+  req.on("data", function (chunk) {
+    body += chunk.toString();
+  });
+
+  return new Promise((resolve) => {
+    req.on("end", async function () {
+      const data = JSON.parse(body);
+      resolve(data);
+    });
+  });
+}
+
+export const helpers = { getRequestJSON };
