@@ -1,6 +1,8 @@
 import { json } from "body-parser";
 import { readFile, writeFile } from "node:fs/promises";
-const FILEPATH = "./ticket1.json";
+import type { Ticket } from "./types/type.ts";
+
+const FILEPATH = "./ticket.json";
 import { AppError } from "./types/appError.ts";
 export async function readTickets(): Promise<Ticket[]> {
   try {

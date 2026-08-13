@@ -1,10 +1,13 @@
-type Status = "pending" | "closed";
-type Priority = "high" | "medium" | "low";
- interface Ticket {
-  id: number;
+export const STATUSES = ["pending", "closed"];
+export const PRIORITIES = ["high", "medium", "low"];
+
+type Status = (typeof STATUSES)[number];
+export type Priority = (typeof PRIORITIES)[number];
+export interface Ticket {
+  id: string;
   title: string;
-  description:string
+  description: string;
   priority: Priority;
   status: Status;
-  assignee: string;
+  assignee: string | null;
 }

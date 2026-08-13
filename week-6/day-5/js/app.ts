@@ -13,5 +13,5 @@ app.get("/", (req, res) => {
 });
 
 app.use(notFoundHandler);
-app.use(errorhandler)
+app.use(errorhandler);
 export default app;
