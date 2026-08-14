@@ -28,7 +28,7 @@ export async function removeTicket(
 ) {
   try {
     const id = req.params.id;
-    const data = await deleteTicket(String(id));
+    await deleteTicket(String(id));
     res.status(200).send("Task deleted successfully");
   } catch (error) {
     next(error);
@@ -42,9 +42,7 @@ export async function getTicket(
 ) {
   try {
     const id = req.params.id;
-    if (!id) {
-      throw new AppError("ID is required", 400);
-    }
+
     const data = await getTicketById(String(id));
     if (!data) throw new AppError("Task not found", 400);
     res.status(200).send(data);

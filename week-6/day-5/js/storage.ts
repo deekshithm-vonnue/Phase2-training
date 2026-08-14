@@ -10,7 +10,7 @@ export async function readTickets(): Promise<Ticket[]> {
     const parsedData = JSON.parse(data);
     return parsedData;
   } catch (error) {
-    throw new AppError("Database not found", 504);
+    return [];
   }
 }
 
