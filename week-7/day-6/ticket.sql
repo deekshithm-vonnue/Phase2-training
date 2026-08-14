@@ -24,6 +24,7 @@ CREATE TABLE
         id INT PRIMARY KEY,
         title VARCHAR(30),
         description TEXT,
+        priority VARCHAR(10),
         status VARCHAR(10),
         customer_id INT NOT NULL,
         category_id INT,
