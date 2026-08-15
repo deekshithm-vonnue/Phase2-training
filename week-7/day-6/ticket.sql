@@ -28,8 +28,8 @@ CREATE TABLE
         status VARCHAR(10),
         customer_id INT NOT NULL,
         category_id INT,
-        FOREIGN KEY (customer_id) REFERENCES TICKET.CUSTOMERS(id),
-        FOREIGN KEY (category_id) REFERENCES TICKET.CATEGORIES(id)
+        FOREIGN KEY (customer_id) REFERENCES TICKET.CUSTOMERS (id),
+        FOREIGN KEY (category_id) REFERENCES TICKET.CATEGORIES (id)
     );
 
 CREATE TABLE
@@ -40,6 +40,7 @@ CREATE TABLE
         FOREIGN KEY (ticket_id) REFERENCES TICKET.TICKETS (id),
         FOREIGN KEY (user_id) REFERENCES TICKET.USERS (id)
     );
+
 CREATE TABLE
     TICKET.COMMENTS (
         id INT PRIMARY KEY,
@@ -52,9 +53,9 @@ CREATE TABLE
 CREATE TABLE
     TICKET.STATUS_HISTORY (
         id INT PRIMARY KEY,
+        ticket_id INT,
         old_status VARCHAR(20),
         new_status VARCHAR(20),
-        reason TEXT
+        reason TEXT,
+        FOREIGN KEY (ticket_id) REFERENCES TICKET.TICKETS (id)
     );
-
-
