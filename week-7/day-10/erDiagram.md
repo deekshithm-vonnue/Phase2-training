@@ -8,7 +8,7 @@ erDiagram
         INT employee_id PK
         VARCHAR name
         VARCHAR email
-        VARCHAR role
+        VARCHAR role "Staff, Technician"
     }
 
     CARTEGORIES{
@@ -17,19 +17,17 @@ erDiagram
     }
     EQUIPMENT{
         INT equiment_id  PK
-        INT caregory_id FK
+        INT cartegory_id FK
         VARCHAR model_name
         VARCHAR status "Available, Maintenance, Retired"
-        BIGINT hourly_fees
     }
 
     MAINTENANCE_RECORDS{
         INT maintenance_id PK
         INT equipment_id FK
         INT technician_id FK
-        TIMESTAMP start_time
-        TIMESTAMP end_time
-        VARCHAR  issue_description
+        TIMESTAMPTZ maintenance_time
+        TEXT  issue_description
         BIGINT maintaince_cost
     }
 
@@ -47,9 +45,6 @@ erDiagram
         INT booking_id PK
         INT employee_id FK
         INT equipment_id FK
-        TIMESTAMPTZ occupied
-        TIMESTAMPTZ return
-        BIGINT total_fee
         VARCHAR booking_status "Pending, Approved, Rejected, Active, Completed"
     }
     EMPLOYEE ||--o{BOOKINGS:"books"
