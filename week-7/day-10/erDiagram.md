@@ -23,25 +23,6 @@ erDiagram
         BIGINT hourly_fees
     }
 
-    BOOKINGS{
-        INT booking_id PK
-        INT employee_id FK
-        INT equipment_id FK
-        TIMESTAMPTZ occupied
-        TIMESTAMPTZ return
-        BIGINT total_fee
-        VARCHAR booking_status "Pending, Approved, Rejected, Active, Completed"
-    }
-
-    APPROVALS{
-        INT approval_id PK
-        INT booking_id FK
-        INT approver_id FK
-        VARCHAR status "Approved, Denied"
-        TIMESTAMPTZ action_date
-        TEXT comment
-    }
-
     MAINTENANCE_RECORDS{
         INT maintenance_id PK
         INT equipment_id FK
@@ -52,6 +33,25 @@ erDiagram
         BIGINT maintaince_cost
     }
 
+
+    APPROVALS{
+        INT approval_id PK
+        INT booking_id FK
+        INT approver_id FK
+        VARCHAR status "Approved, Denied"
+        TIMESTAMPTZ action_date
+        TEXT comment
+    }
+
+    BOOKINGS{
+        INT booking_id PK
+        INT employee_id FK
+        INT equipment_id FK
+        TIMESTAMPTZ occupied
+        TIMESTAMPTZ return
+        BIGINT total_fee
+        VARCHAR booking_status "Pending, Approved, Rejected, Active, Completed"
+    }
     EMPLOYEE ||--o{BOOKINGS:"books"
     EQUIPMENT||--o{ BOOKINGS:"has"
     CARTEGORIES||--o{EQUIPMENT:"classifies"
