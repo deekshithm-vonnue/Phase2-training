@@ -2,9 +2,10 @@ import type { Request, Response, NextFunction } from "express";
 import { readTickets } from "./storage.ts";
 import {
   addTicket,
+  assignee,
   deleteTicket,
   getTicketById,
-  updateAssigneeOrStatusOrBoth,
+  updateStatus,
   validateTicket,
 } from "./services.ts";
 import { AppError } from "./types/appError.ts";
@@ -20,7 +21,7 @@ export async function getAllTickets(
 
     res.status(200).json(data.rows);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     next(error);
   }
 }
@@ -31,7 +32,7 @@ export async function removeTicket(
 ) {
   try {
     const id = req.params.id;
-    await deleteTicket(String(id));
+    await deleteTicket(Number(id));
     res.status(200).send("Task deleted successfully");
   } catch (error) {
     next(error);
@@ -46,7 +47,7 @@ export async function getTicket(
   try {
     const id = req.params.id;
 
-    const data = await getTicketById(String(id));
+    const data = await getTicketById(Number(id));
     if (!data) throw new AppError("Task not found", 400);
     res.status(200).send(data);
   } catch (error) {
@@ -62,20 +63,39 @@ export async function createTicket(
   try {
     const body = req.body;
     validateTicket(body);
-    await addTicket(body);
-    res.status(201).send("Task created successfully");
+    const newTicket =await addTicket(body);
+    res.status(201).json({status:"Success",newTicket});
   } catch (error) {
     next(error);
   }
 }
 
-export async function update(req: Request, res: Response, next: NextFunction) {
+export async function assigneeHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const id = req.params.id;
     const body = req.body;
-    await updateAssigneeOrStatusOrBoth(String(id), body);
+    console.log("df")
+    await assignee(Number(id), body.userId);
     res.status(200).send("Successfuly updated");
   } catch (error) {
     next(error);
+  }
+}
+export async function updateStatusHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const id = req.params.id;
+    const body = req.body;
+    await updateStatus(Number(id), body);
+    res.status(200).send("Successfuly updated");
+  } catch (Error) {
+    next(Error);
   }
 }

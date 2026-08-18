@@ -1,13 +1,11 @@
-import app from "../js/app";
 import request from "supertest";
-import { readTickets, saveTicket } from "../js/storage";
 import { Ticket } from "../js/types/type";
 import {
   deleteTicket,
   getTicketById,
   addTicket,
   validateTicket,
-  updateAssigneeOrStatusOrBoth,
+
 } from "../js/services";
 import { AppError } from "../js/types/appError";
 jest.mock("../js/storage", () => ({
@@ -15,16 +13,9 @@ jest.mock("../js/storage", () => ({
   saveTicket: jest.fn(),
 }));
 
-jest.mock("../js/services", () => ({
-  getTicketById: jest.fn(),
-  deleteTicket: jest.fn(),
-  addTicket: jest.fn(),
-  validateTicket: jest.fn(),
-  updateAssigneeOrStatusOrBoth: jest.fn(),
-}));
+
 describe("Get endpoint validation", () => {
-  const mockreadTickets = readTickets as jest.Mock;
-  const mockGetTicket = getTicketById as jest.Mock;
+
   let initialState: Ticket[];
   beforeEach(() => {
     initialState = [
@@ -33,8 +24,8 @@ describe("Get endpoint validation", () => {
         description: "implementation login page",
         priority: "high",
         status: "closed",
-        assignee: "none",
-        id: "aa4718bc-d053-41ec-9720-41d52c397f65",
+        categoryId: 1,
+        customerId:1,
       },
     ];
   });

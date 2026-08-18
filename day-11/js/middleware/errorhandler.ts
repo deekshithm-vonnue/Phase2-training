@@ -10,5 +10,13 @@ export async function errorhandler(
   res: Response,
   next: NextFunction,
 ) {
-  res.status(err.statusCode).send(err.message);
+  const statusCode = Number.isInteger(err.statusCode) ? err.statusCode : 500;
+  const message = err.message || "An unexpected error occurred";
+  console.error("Unhandled Error logged:", err);
+
+  res.status(statusCode).json({
+    status: "error",
+    statusCode: statusCode,
+    message: message
+  });
 }

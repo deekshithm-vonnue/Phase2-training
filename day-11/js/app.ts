@@ -7,10 +7,8 @@ const app = express();
 
 app.use(express.json());
 app.use(requestLogger);
-app.use("/tickets", router);
-app.get("/", (req, res) => {
-  res.send("Welcome to Home Page");
-});
+app.use("/", router);
+
 
 app.use(notFoundHandler);
 app.use(errorhandler);
