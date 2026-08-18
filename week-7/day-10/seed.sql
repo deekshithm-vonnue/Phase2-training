@@ -24,6 +24,11 @@ VALUES
     ('akshay', 'askshay@gmail.com', 'Staff');
 
 INSERT INTO
+    EQUIPMENT.EMPLOYEE (name, email, role)
+VALUES
+    ('akku', 'askku@gmail.com', 'Staff');
+
+INSERT INTO
     EQUIPMENT.CATEGORIES (category_name)
 VALUES
     ('IT & Computing'),
@@ -168,11 +173,6 @@ VALUES
     (2, 4, 'Pending'),
     (2, 1, 'Approved'),
     (5, 2, 'Pending');
-
-INSERT INTO
-    EQUIPMENT.APPROVALS (booking_id, approver_id, status, comment)
-VALUES
-    (2, 1, 'Approved', 'use for 2 days');
 
 INSERT INTO
     EQUIPMENT.APPROVALS (booking_id, approver_id, status, comment)
