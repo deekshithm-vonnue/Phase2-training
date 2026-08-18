@@ -1,5 +1,5 @@
 import app from "./app.ts";
-
+import db from "./db.ts"
 const hostname = "127.0.0.1";
 const port = 3000;
 

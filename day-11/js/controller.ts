@@ -8,6 +8,7 @@ import {
   validateTicket,
 } from "./services.ts";
 import { AppError } from "./types/appError.ts";
+import pool from "./db.ts";
 
 export async function getAllTickets(
   req: Request,
@@ -15,9 +16,11 @@ export async function getAllTickets(
   next: NextFunction,
 ) {
   try {
-    const data = await readTickets();
-    res.status(200).send(data);
+    const data = await pool.query("SELECT * FROM ticket.tickets ORDER by id;");
+
+    res.status(200).json(data.rows);
   } catch (error) {
+    console.log(error)
     next(error);
   }
 }

@@ -1,41 +1,55 @@
+import pool from "./db.ts";
 import { readTickets, saveTicket } from "./storage.ts";
 import { AppError } from "./types/appError.ts";
 import { type Ticket, PRIORITIES, STATUSES } from "./types/type.ts";
+
 export async function getTicketById(id: string): Promise<Ticket | undefined> {
-  const tasks = await readTickets();
-  return tasks.find((task) => task.id === id);
+  const query = {
+    text: "SELECT * FROM ticket.tickets WHERE id=$1",
+    values: [id],
+  };
+  const result = await pool.query(query);
+  return result.rows[0];
 }
 
 export async function deleteTicket(id: string): Promise<void> {
-  const tasks = await readTickets();
-  const updatedTasks = tasks.filter((task) => task.id !== id);
-  if (updatedTasks.length === tasks.length)
-    throw new AppError("Deletion failed", 400);
-  saveTicket(updatedTasks);
+  const query = {
+    text: "DELETE FROM ticket.tickets WHERE id=$1 RETURNING *",
+    values: [id],
+  };
+  const deletedTask = await pool.query(query);
+  if (!deletedTask) throw new AppError("Deletion failed", 400);
 }
 
 export function validateTicket(ticket: Ticket) {
+  const errors: string[] = [];
   if (typeof ticket.title !== "string" || ticket.title.trim() === "") {
-    throw new AppError("Title field is missing", 401);
+    errors.push("Title field is missing");
   }
   if (
     typeof ticket.description !== "string" ||
     ticket.description.trim() === ""
   ) {
-    throw new AppError("description field is missing", 401);
+    errors.push("description field is missing");
   }
   if (
     typeof ticket.priority !== "string" ||
     !PRIORITIES.includes(ticket.priority)
   ) {
-    throw new AppError("priority field is missing or invalid", 401);
+    errors.push("priority field is missing or invalid");
   }
   if (typeof ticket.status !== "string" || !STATUSES.includes(ticket.status)) {
-    throw new AppError("status field is missing or invalid", 401);
+    errors.push("description field is missing");
+  }
+  if (errors.length > 0) {
+    throw new AppError(errors.join(", "), 400);
   }
 }
 
 export async function addTicket(ticket: Ticket): Promise<void> {
+  const query = {
+    text: "INSERT INTO support_tickets.users(title",
+  };
   ticket.id = crypto.randomUUID();
   ticket.assignee = "none";
   const tasks = await readTickets();
