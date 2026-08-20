@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["ticket"]
+}
+
+enum status {
+  open
+  working
+  close
+
+  @@schema("ticket")
+}
+
+enum priority {
+  low
+  medium
+  high
+
+  @@schema("ticket")
+}
+
+model assignments {
+  id        Int      @id @default(autoincrement())
+  ticket_id Int?
+  user_id   Int?
+  tickets   tickets? @relation(fields: [ticket_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users     users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("ticket")
+}
+
+model categories {
+  id       Int       @id @default(autoincrement())
+  category String?   @db.VarChar(30)
+  tickets  tickets[]
+
+  @@schema("ticket")
+}
+
+model comments {
+  id        Int      @id @default(autoincrement())
+  comment   String?
+  author    String?  @db.VarChar(20)
+  ticket_id Int?
+  tickets   tickets? @relation(fields: [ticket_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("ticket")
+}
+
+model customers {
+  id      Int       @id
+  name    String    @db.VarChar(20)
+  email   String    @unique @db.VarChar(100)
+  tickets tickets[]
+
+  @@schema("ticket")
+}
+
+model status_history {
+  id         Int     @id
+  old_status String? @db.VarChar(20)
+  new_status String? @db.VarChar(20)
+  reason     String?
+
+  @@schema("ticket")
+}
+
+model tickets {
+  id          Int           @id @default(autoincrement())
+  title       String?       @db.VarChar(30)
+  description String?
+  priority    priority      @default(low)
+  status      status        @default(open)
+  customer_id Int
+  category_id Int?
+  assignments assignments[]
+  comments    comments[]
+  categories  categories?   @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  customers   customers     @relation(fields: [customer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdAt   DateTime      @default(now()) @db.Timestamptz(3)
+
+  @@schema("ticket")
+}
+
+model users {
+  id          Int           @id
+  name        String        @db.VarChar(20)
+  email       String        @unique @db.VarChar(100)
+  assignments assignments[]
+
+  @@schema("ticket")
+}
