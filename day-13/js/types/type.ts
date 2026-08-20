@@ -18,7 +18,7 @@ export const allowedSortFields = [
   "status",
   "priority",
   "createdAt",
-];
+] as const ;
 
 export type SortField = (typeof allowedSortFields)[number];
 export type SortDirection = "asc" | "desc";

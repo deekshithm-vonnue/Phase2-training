@@ -3,6 +3,15 @@ import { Prisma } from "../../generated/prisma/client";
 import { status } from "../../generated/prisma/enums";
 import { AppError } from "../types/appError";
 import { SortDirection, SortField, Ticket } from "../types/type";
+
+interface FilterTicketsParams {
+  where: Prisma.ticketsWhereInput;
+  skip: number;
+  take: number;
+  sortField: SortField;
+  sortDirection: SortDirection;
+}
+
 export class TicketRepository {
   async findById(id: number) {
     try {
@@ -62,24 +71,24 @@ export class TicketRepository {
     });
   }
 
-  async count(where: Prisma.ticketsWhereInput): Promise<number> {
+   async count(where: Prisma.ticketsWhereInput): Promise<number> {
     return prisma.tickets.count({ where });
   }
 
-  async filterMany(
-    where: Prisma.ticketsWhereInput,
-    skip: number,
-    take: number,
-    sortField: SortField,
-    sortDirection: SortDirection,
-  ) {
+  async filterMany({
+    where,
+    skip,
+    take,
+    sortField,
+    sortDirection,
+  }: FilterTicketsParams) {
     return prisma.tickets.findMany({
       where,
       skip,
       take,
       orderBy: {
-        [sortField]: sortDirection,
-      },
+        [sortField]: sortDirection
+      } as Prisma.ticketsOrderByWithRelationInput,
       include: {
         assignments: true,
       },

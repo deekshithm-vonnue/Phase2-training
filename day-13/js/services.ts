@@ -126,7 +126,7 @@ export const getTicketsFilter = async (query: TicketQuery) => {
   const take = pageSize;
   const [total, tickets] = await Promise.all([
     ticketConnect.count(where),
-    ticketConnect.filterMany(where, skip, take, sortField, sortDirection),
+    ticketConnect.filterMany({where, skip, take, sortField, sortDirection}),
   ]);
 
   const totalPages = Math.ceil(total / pageSize);

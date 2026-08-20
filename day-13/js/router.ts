@@ -5,10 +5,10 @@ import {
   createTicket,
   getAllTickets,
   getTicket,
+  getTicketsController,
   removeTicket,
   updateStatusHandler,
 } from "./controller.ts";
-import { getTicketsFilter } from "./services.ts";
 import {validateTicketQuery} from "./middleware/ticketQuery.ts";
 
 const router = Router();
@@ -22,7 +22,7 @@ router.delete("/tickets/:id", removeTicket);
 router.post("/tickets/create", createTicket);
 router.post("/tickets/assignee/:id", assigneeHandler);
 router.patch("/tickets/status/:id", updateStatusHandler);
-router.get("/tickets", validateTicketQuery, getTicketsFilter);
+router.get("/tickets", validateTicketQuery, getTicketsController);
 
 // router.post("/category/create",createCategory);
 // router.post("/user/create","createNewUser");

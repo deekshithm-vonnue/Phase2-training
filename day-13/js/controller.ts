@@ -101,13 +101,14 @@ export async function updateStatusHandler(
   }
 }
 
-export const getTickets = async (
+export const getTicketsController = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const ticketQuery = res.locals.ticketQuery as TicketQuery;
+console.log(ticketQuery)
     const result = await getTicketsFilter(ticketQuery);
 
     return res.status(200).json({
@@ -116,6 +117,6 @@ export const getTickets = async (
       pagination: result.pagination,
     });
   } catch (error) {
-    next(error);
+    next(error); 
   }
 };

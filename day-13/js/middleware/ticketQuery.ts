@@ -22,7 +22,7 @@ export const validateTicketQuery = (
     priority,
     assignee,
     search,
-    sortField = "createdAt", // 👈 Fixed typo: "creatAt" -> "createdAt"
+    sortField = "id", 
     sortDirection = "desc",
   } = req.query;
 
@@ -37,7 +37,6 @@ export const validateTicketQuery = (
     return res.status(400).json({ success: false, message: "Page size must be a positive integer" });
   }
 
-  // Only validate status if the user actually passed it
   if (status !== undefined && !STATUSES.includes(status as Status)) {
     return res.status(400).json({
       success: false,
@@ -45,7 +44,7 @@ export const validateTicketQuery = (
     });
   }
 
-  // Only validate priority if the user actually passed it
+
   if (priority !== undefined && !PRIORITIES.includes(priority as Priority)) {
     return res.status(400).json({
       success: false,
@@ -69,12 +68,11 @@ export const validateTicketQuery = (
     return res.status(400).json({ success: false, message: "sortDirection must be 'asc' or 'desc'" });
   }
 
-  // Safe mapping: if they are undefined, they stay undefined
   const validatedQuery: TicketQuery = {
     page: pageNumber,
     pageSize: PageSizeNumber,
-    status: status ? (status as Status) : undefined,     // 👈 Kept safe if missing
-    priority: priority ? (priority as Priority) : undefined, // 👈 Kept safe if missing
+    status: status ? (status as Status) : undefined,    
+    priority: priority ? (priority as Priority) : undefined, 
     assignee: assigneeNumber,
     search: typeof search === "string" ? search.trim() : undefined,
     sortField: sortField as SortField,
