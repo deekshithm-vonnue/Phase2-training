@@ -36,7 +36,7 @@ export class TicketRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2025") {
-          return null;
+          throw error;
         }
       }
       throw error;
@@ -71,7 +71,7 @@ export class TicketRepository {
     });
   }
 
-   async count(where: Prisma.ticketsWhereInput): Promise<number> {
+  async count(where: Prisma.ticketsWhereInput): Promise<number> {
     return prisma.tickets.count({ where });
   }
 
@@ -87,7 +87,7 @@ export class TicketRepository {
       skip,
       take,
       orderBy: {
-        [sortField]: sortDirection
+        [sortField]: sortDirection,
       } as Prisma.ticketsOrderByWithRelationInput,
       include: {
         assignments: true,
