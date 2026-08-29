@@ -5,8 +5,9 @@ import morgan from "morgan";
 import { requestLogger } from "./middleware/requestLogger.ts";
 import { errorhandler, notFoundHandler } from "./middleware/errorhandler.ts";
 import { prisma } from "./db/prisma.ts";
-import ticketRoutes from "./module/tickets/ticket.routes.ts";
 import { authRoutes } from "./module/auth/auth.routes.ts";
+import ticketRoutes from "./module/tickets/ticket.routes.ts";
+import { userRoutes } from "./module/users/user.routes.ts";
 
 const app = express();
 
@@ -32,8 +33,9 @@ app.get("/", (_req, res) => {
   res.send("Welcome to Home Page");
 });
 
-app.use('/api/auth',authRoutes)
-// app.use("/", ticketRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/tickets", ticketRoutes);
+app.use("/api/users", userRoutes);
 
 app.use(notFoundHandler);
 app.use(errorhandler);

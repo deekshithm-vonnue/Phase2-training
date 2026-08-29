@@ -1,26 +1,41 @@
 import { Router } from "express";
 
-import {
-  assigneeHandler,
-  createTicket,
-  getAllTickets,
-  getTicket,
-  getTicketsController,
-  removeTicket,
-  updateStatusHandler,
-} from "./ticket.controller.ts";
 import { validateTicketQuery } from "../../middleware/ticketQuery.ts";
+import { requireAuth } from "../../middleware/auth.middleware.ts";
+import { validate } from "../../middleware/validation.middleware.ts";
+import {
+  createTicketSchema,
+  listTicketsQuerySchema,
+  ticketIdParamSchema,
+} from "./ticket.schemas.ts";
+import { ticketController } from "./ticket.controller.ts";
+import { authorize } from "../../middleware/authorize.middleware.ts";
 
 const ticketRoutes = Router();
+ticketRoutes.use(requireAuth);
+ticketRoutes.get(
+  "/",
+  validate({ query: listTicketsQuerySchema }),
+  authorize("ticket", "read"),
+  ticketController.list,
+);
+ticketRoutes.get(
+  "/:id",
+  validate({ params: ticketIdParamSchema }),
+  authorize("ticket", "read"),
+  ticketController.getById,
+);
+ticketRoutes.delete(
+  "/:id",
+  validate({ params: ticketIdParamSchema }),
+  authorize("ticket", "delete"),
+  ticketController.delete,
+);
+ticketRoutes.post(
+  "/create",
+  validate({ body: createTicketSchema }),
+  authorize("ticket", "create"),
+  ticketController.create,
+);
 
-// router.get("/tickets", getAllTickets);
-ticketRoutes.get("/tickets/:id", getTicket);
-ticketRoutes.delete("/tickets/:id", removeTicket);
-ticketRoutes.post("/tickets/create", createTicket);
-ticketRoutes.post("/tickets/assignee/:id", assigneeHandler);
-ticketRoutes.patch("/tickets/status/:id", updateStatusHandler);
-ticketRoutes.get("/tickets", validateTicketQuery, getTicketsController);
-
-// router.post("/category/create",createCategory);
-// router.post("/user/create","createNewUser");
 export default ticketRoutes;

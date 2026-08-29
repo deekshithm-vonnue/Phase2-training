@@ -1,5 +1,5 @@
-export const STATUSES = ["OPEN", "IN_PROGRESS", "CLOSED","RESOLVED"] as const;
-export const PRIORITIES = ["HIGH", "MEDIUM", "LOW","URGENT"] as const;
+export const STATUSES = ["OPEN", "IN_PROGRESS", "CLOSED", "RESOLVED"] as const;
+export const PRIORITIES = ["HIGH", "MEDIUM", "LOW", "URGENT"] as const;
 
 export type Status = (typeof STATUSES)[number];
 export type Priority = (typeof PRIORITIES)[number];
@@ -8,8 +8,7 @@ export interface Ticket {
   description: string;
   priority: Priority;
   status: Status;
-  categoryId: number;
-  customerId: number;
+  createdById: number;
 }
 
 export const allowedSortFields = [
@@ -18,7 +17,7 @@ export const allowedSortFields = [
   "status",
   "priority",
   "createdAt",
-] as const ;
+] as const;
 
 export type SortField = (typeof allowedSortFields)[number];
 export type SortDirection = "asc" | "desc";

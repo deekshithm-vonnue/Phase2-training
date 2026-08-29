@@ -1,121 +1,51 @@
 import type { Request, Response, NextFunction } from "express";
-import {
-  addTicket,
-  assignee,
-  deleteTicket,
-  getTicketById,
-  getTicketsFilter,
-  updateStatus,
-  validateTicket,
-} from "./ticket.services.ts";
-import { AppError } from "../../types/appError.ts";
+
 import { TicketRepository } from "./ticket.repository.ts";
 import { TicketQuery } from "../../types/type.ts";
+import { TicketService } from "./ticket.services.ts";
+import { AuthenticateRequest } from "../../types/auth.ts";
+import { CreateTicketInput, ListTicketsInput } from "./ticket.schemas.ts";
 
 const repository = new TicketRepository();
-export async function getAllTickets(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const data = await repository.findTickets();
-    res.status(200).json(data);
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-}
-export async function removeTicket(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const id = req.params.id;
-    await deleteTicket(Number(id));
-    res.status(200).send("Task deleted successfully");
-  } catch (error) {
-    next(error);
-  }
+
+const ticketService = new TicketService();
+
+function authUser(request: Request) {
+  return (request as AuthenticateRequest).user!;
 }
 
-export async function getTicket(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const id = req.params.id;
+export class TicketController {
+  async create(request: Request, response: Response) {
+    const ticket = await ticketService.createTicket(
+      authUser(request),
+      request.body as CreateTicketInput,
+    );
+    response.status(201).json({ data: ticket });
+  }
 
-    const data = await getTicketById(Number(id));
-    if (!data) throw new AppError("Task not found", 400);
-    res.status(200).send(data);
-  } catch (error) {
-    next(error);
+  async list(request: Request, response: Response) {
+    const result = await ticketService.list(
+      authUser(request),
+      request.query as unknown as ListTicketsInput,
+    );
+    response.json(result);
+  }
+
+  async getById(request: Request, response: Response) {
+    const ticket = await ticketService.getTicketById(
+      authUser(request),
+      Number(request.params.id),
+    );
+    response.json({ data: ticket });
+  }
+
+    async delete(request: Request, response: Response) {
+    const ticket = await ticketService.deleteTicket(
+      authUser(request),
+      Number(request.params.id)
+    );
+    response.json({ data: ticket });
   }
 }
 
-export async function createTicket(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const body = req.body;
-    validateTicket(body);
-    const newTicket = await addTicket(body);
-    res.status(201).json({ status: "Success", newTicket });
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function assigneeHandler(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const id = req.params.id;
-    const body = req.body;
-    await assignee(Number(id), body.userId);
-    res.status(200).send("Successfuly updated");
-  } catch (error) {
-    next(error);
-  }
-}
-export async function updateStatusHandler(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const id = req.params.id;
-    const body = req.body;
-    await updateStatus(Number(id), body);
-    res.status(200).send("Successfuly updated");
-  } catch (Error) {
-    next(Error);
-  }
-}
-
-export const getTicketsController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const ticketQuery = res.locals.ticketQuery as TicketQuery;
-    console.log(ticketQuery);
-    const result = await getTicketsFilter(ticketQuery);
-
-    return res.status(200).json({
-      success: true,
-      data: result.data,
-      pagination: result.pagination,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+export const ticketController = new TicketController();

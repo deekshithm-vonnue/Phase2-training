@@ -4,9 +4,9 @@ import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { TicketPriority, TicketStatus } from "@prisma/client";
 import { Prisma } from "@prisma/client";
+
 const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaPg({ connectionString });
-
 const prisma = new PrismaClient({ adapter });
 
 type SeedUser = {
@@ -63,36 +63,12 @@ async function upsertUser(user: SeedUser) {
 }
 
 async function main() {
-  const seededUser = await Promise.all(users.map(upsertUser));
-  const byEmail = new Map(seededUser.map((user) => [user.email, user]));
+  const seededUsers = await Promise.all(users.map(upsertUser));
+  const byEmail = new Map(seededUsers.map((user) => [user.email, user]));
 
-  const categoryInputs: Prisma.CategoryUncheckedCreateInput[] = [
-    {
-      id: 1,
-      category: "TECHNICAL",
-    },
-    {
-      id: 2,
-      category: "GENERAL",
-    },
-  ];
-
-  const seededcategory = [];
-  for (const category of categoryInputs) {
-    const result = await prisma.category.upsert({
-      where: {
-        id: category.id,
-      },
-      update: category,
-      create: category,
-    });
-
-    seededcategory.push(result);
-  }
-
-  const byCategoryId = new Map(
-    seededcategory.map((category) => [category.id, category]),
-  );
+  const agentId = byEmail.get("agent@example.com")?.id || null;
+  const user1Id = byEmail.get("user1@example.com")?.id || null;
+  const user2Id = byEmail.get("user2@example.com")?.id || null;
 
   const ticketInputs: Prisma.TicketUncheckedCreateInput[] = [
     {
@@ -100,37 +76,42 @@ async function main() {
       description: "Password reset emails are not arriving for some accounts.",
       status: TicketStatus.OPEN,
       priority: TicketPriority.HIGH,
-      category_id: byCategoryId.get(1)!.id,
+      assignedToId: agentId,
+      createdById: user1Id, 
     },
     {
       title: "Incorrect invoice total",
       description: "Tax is being applied twice on renewal invoices.",
       status: TicketStatus.CLOSED,
       priority: TicketPriority.HIGH,
-      category_id: byCategoryId.get(1)!.id,
+      assignedToId: agentId,
+      createdById: user2Id, 
     },
     {
       title: "Cannot update profile",
-      description:
-        "Saving changes on the profile page returns a generic error.",
+      description: "Saving changes on the profile page returns a generic error.",
       status: TicketStatus.OPEN,
       priority: TicketPriority.MEDIUM,
-      category_id: byCategoryId.get(2)!.id,
+      assignedToId: null,
+      createdById: user1Id, 
     },
     {
       title: "Export report fails",
       description: "CSV export for weekly reports stops with a timeout.",
       status: TicketStatus.IN_PROGRESS,
       priority: TicketPriority.HIGH,
-      category_id: byCategoryId.get(1)!.id,
+      assignedToId: agentId,
+      createdById: user2Id, 
     },
   ];
 
   for (const ticket of ticketInputs) {
-    const result = await prisma.ticket.create({
+    await prisma.ticket.create({
       data: ticket,
     });
   }
+  
+  console.log("Seeding completed successfully.");
 }
 
 main()

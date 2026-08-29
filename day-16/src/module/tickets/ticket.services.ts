@@ -1,140 +1,129 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, Role, TicketPriority, TicketStatus } from "@prisma/client";
 import { TicketRepository } from "./ticket.repository.ts";
-import { AppError } from "../../types/appError.ts";
 import {
-  type Ticket,
-  PRIORITIES,
-  STATUSES,
-  TicketQuery,
-} from "../../types/type.ts";
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from "../../utils/error.ts";
+import { CreateTicketInput, ListTicketsInput } from "./ticket.schemas.ts";
+import { AuthUser } from "../../types/auth.ts";
 
-const ticketConnect = new TicketRepository();
+const repository = new TicketRepository();
 
-export async function getTicketById(id: number) {
-  const result = await ticketConnect.findById(id);
-
-  return result;
+function canViewTicket(user: AuthUser, ticket: Prisma.TicketGetPayload<{}>) {
+  if (user.role === Role.ADMIN ) {
+    return true;
+  }
+  
+  if(user.role === Role.AGENT){
+   return ticket.assignedToId === Number(user.userId);
+  }
+  return ticket.createdById === Number(user.userId);
 }
 
-export async function deleteTicket(id: number): Promise<void> {
-  try {
-    const deletedTicket = await ticketConnect.findAndDelete(id);
-  } catch (error) {
-    throw new AppError("Deletion failed", 400);
-  }
+function canAssignTicket(user: AuthUser) {
+  return user.role === Role.ADMIN || user.role === Role.AGENT;
 }
 
-export function validateTicket(ticket: Ticket) {
-  const errors: string[] = [];
-  if (typeof ticket.title !== "string" || ticket.title.trim() === "") {
-    errors.push("Title field is missing");
-  }
-  if (
-    typeof ticket.description !== "string" ||
-    ticket.description.trim() === ""
-  ) {
-    errors.push("description field is missing");
-  }
-  if (
-    typeof ticket.priority !== "string" ||
-    !PRIORITIES.includes(ticket.priority)
-  ) {
-    errors.push("priority field is missing or invalid");
-  }
-  if (typeof ticket.status !== "string" || !STATUSES.includes(ticket.status)) {
-    errors.push("status field is missing or invalid");
-  }
-  if (errors.length > 0) {
-    throw new AppError(errors.join(", "), 400);
-  }
-}
+export class TicketService {
+  async createTicket(currentUser: AuthUser, input: CreateTicketInput) {
+    let assignedToId: number | null = null;
 
-export async function addTicket(ticket:any) {
-  try {
-    const result = await ticketConnect.createTicket(ticket);
-    return result;
-  } catch {
-    throw new AppError("Adding to ticket failed", 400);
-  }
-}
+    if (input.assignedToId) {
+      if (!canAssignTicket(currentUser)) {
+        throw new ForbiddenError("You are not allowed to assign tickets");
+      }
 
-export async function assignee(id: number, userId: number) {
-  try {
-    await ticketConnect.createAssigne(id, userId);
-  } catch (error) {
-    throw new AppError("Assigning assignee failed", 400);
-  }
-}
+      const numericAssigneeId = Number(input.assignedToId);
+      const assignee =
+        await repository.findAssignableUserById(numericAssigneeId);
 
-export async function updateStatus(
-  id: number,
-  ticket: Pick<Ticket, "status">,
-): Promise<void> {
-  try {
-    if (
-      typeof ticket.status !== "string" ||
-      !STATUSES.includes(ticket.status)
-    ) {
-      throw new AppError("status field is missing or invalid", 400);
+      if (
+        !assignee ||
+        (assignee.role !== Role.AGENT && assignee.role !== Role.ADMIN)
+      ) {
+        throw new BadRequestError(
+          "INVALID_ASSIGNEE",
+          "Assigned user must be an admin or agent",
+        );
+      }
+
+      if (
+        currentUser.role === Role.AGENT &&
+        assignee.id !== Number(currentUser.userId)
+      ) {
+        throw new ForbiddenError(
+          "Agents can only assign tickets to themselves",
+        );
+      }
+
+      assignedToId = assignee.id;
     }
-    await ticketConnect.findAndUpdateStatus(id, ticket.status);
-  } catch (error) {
-    throw new AppError("Ticket not found or update failed", 404);
+
+    return repository.createTicket({
+      title: input.title,
+      description: input.description,
+      priority: input.priority,
+      createdById: Number(currentUser.userId),
+      assignedToId: assignedToId,
+    });
+  }
+
+  async getTicketById(currentUser: AuthUser, id: number) {
+    const result = await repository.findById(id);
+
+    if (!result) {
+      throw new NotFoundError("TICKET_NOT_FOUND", "Ticket not found");
+    }
+
+    if (!canViewTicket(currentUser, result)) {
+      throw new ForbiddenError("You are not allowed to view this ticket");
+    }
+    return result;
+  }
+
+  async deleteTicket(currentUser: AuthUser, id: number) {
+    const ticket = await repository.findById(id);
+    if (!ticket) {
+      throw new NotFoundError("TICKET_NOT_FOUND", "Ticket not found");
+    }
+
+    if (!canViewTicket(currentUser, ticket)) {
+      throw new ForbiddenError("You are not allowed to delete this ticket");
+    }
+
+    return repository.delete(id);
+  }
+
+  async list(currentUser: AuthUser, input: ListTicketsInput) {
+    const filter: Partial<{
+      status: TicketStatus;
+      priority: TicketPriority;
+      assignedToId: number;
+      createdById: number;
+    }> = {};
+
+    if (input.status) {
+      filter.status = input.status;
+    }
+
+    if (input.priority) {
+      filter.priority = input.priority;
+    }
+
+    if (currentUser.role === Role.USER) {
+      filter.createdById = Number(currentUser.userId);
+    } else {
+      if (input.assignedToId) {
+        filter.assignedToId = input.assignedToId;
+      }
+      if (input.createdById) {
+        filter.createdById = Number(input.createdById);
+      }
+    }
+
+    const result = await repository.findMany(filter);
+
+    return result;
   }
 }
-
-export const getTicketsFilter = async (query: TicketQuery) => {
-  const {
-    page,
-    pageSize,
-    status,
-    priority,
-    assignee,
-    search,
-    sortField,
-    sortDirection,
-  } = query;
-
-  const skip = (page - 1) * pageSize;
-  const where: Prisma.TicketWhereInput = {};
-
-  if (status) {
-    where.status = status;
-  }
-
-  if (priority) {
-    where.priority = priority;
-  }
-
-  if (assignee) {
-    where.assignments = {
-      some: {
-        user_id: assignee,
-      },
-    };
-  }
-
-  if (search) {
-    where.OR = [
-      { title: { contains: search, mode: "insensitive" } },
-      { description: { contains: search, mode: "insensitive" } },
-    ];
-  }
-  const take = pageSize;
-  const [total, tickets] = await Promise.all([
-    ticketConnect.count(where),
-    ticketConnect.filterMany({ where, skip, take, sortField, sortDirection }),
-  ]);
-
-  const totalPages = Math.ceil(total / pageSize);
-
-  return {
-    data: tickets,
-    pagination: {
-      page,
-      pageSize,
-      total,
-      totalPages,
-    },
-  };
-};

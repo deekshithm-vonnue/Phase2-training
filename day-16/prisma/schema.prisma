@@ -33,48 +33,34 @@ enum TicketPriority {
   @@schema("ticket-management")
 }
 
-model Assignment {
-  id             Int    @id @default(autoincrement())
-  ticket_id      Int
-  user_id        Int
-  assignedTicket Ticket @relation("assignedTicket", fields: [ticket_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  assignedUser   User   @relation("assignedUser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@schema("ticket-management")
-}
-
-model Category {
-  id       Int      @id @default(autoincrement())
-  category String
-  tickets  Ticket[] @relation("categoriesTicket")
-
-  @@schema("ticket-management")
-}
-
 model Ticket {
-  id          Int            @id @default(autoincrement())
-  title       String         @db.VarChar(30)
-  description String
-  priority    TicketPriority @default(MEDIUM)
-  status      TicketStatus   @default(OPEN)
-  category_id Int
-  createdAt   DateTime       @default(now()) @db.Timestamptz(3)
+  id           Int            @id @default(autoincrement())
+  title        String         @db.VarChar(30)
+  description  String
+  priority     TicketPriority @default(MEDIUM)
+  status       TicketStatus   @default(OPEN)
+  createdAt    DateTime       @default(now()) @db.Timestamptz(3)
+  
+  assignedToId Int?
+  assignedTo   User?          @relation("AssignedTickets", fields: [assignedToId], references: [id], onDelete: SetNull)
 
-  assignments Assignment[] @relation("assignedTicket")
-  categories  Category     @relation("categoriesTicket", fields: [category_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  createdById  Int?
+  createdBy    User?          @relation("CreatedTickets", fields: [createdById], references: [id], onDelete: SetNull)
 
   @@schema("ticket-management")
 }
 
 model User {
-  id           Int          @id @default(autoincrement())
-  email        String       @unique
-  passwordHash String
-  name         String
-  role         Role         @default(USER)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  assignments  Assignment[] @relation("assignedUser")
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  passwordHash    String
+  name            String
+  role            Role     @default(USER)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  assignedTickets Ticket[] @relation("AssignedTickets")
+  createdTickets  Ticket[] @relation("CreatedTickets")
 
   @@schema("ticket-management")
 }

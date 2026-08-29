@@ -19,4 +19,15 @@ export class AuthRepository {
       where: { id: userId },
     });
   }
+
+    async findAssignableUserById(id: number) {
+    return prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        role: true,
+        name: true,
+        email: true
+      }
+    });}
 }
