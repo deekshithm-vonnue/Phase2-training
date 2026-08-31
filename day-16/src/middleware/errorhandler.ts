@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { AppError } from "../types/appError.ts";
+import { AppError } from "../utils/error.js";
 export async function notFoundHandler(req: Request, res: Response) {
   res.status(404).send("Not found - 404");
 }
@@ -16,6 +16,6 @@ export async function errorhandler(
   res.status(statusCode).json({
     status: "error",
     statusCode: statusCode,
-    message: message
+    message: message,
   });
 }
