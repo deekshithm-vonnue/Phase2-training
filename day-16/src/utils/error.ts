@@ -14,6 +14,17 @@ export class UnauthorizedError extends AppError {
   }
 }
 
+export class ToManyRequestError extends AppError {
+  public readonly retrtAfter?: number;
+  constructor(
+    message = "Too many requests. Please try again later",
+    retryAfter?: number,
+  ) {
+    super(429, "REQUESET_EXCEEDED", message);
+    this.retrtAfter = retryAfter;
+  }
+}
+
 export class ForbiddenError extends AppError {
   constructor(message = "Forbidden") {
     super(403, "FORBIDEEN", message);

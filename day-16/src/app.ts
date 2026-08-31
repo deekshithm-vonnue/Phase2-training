@@ -8,12 +8,14 @@ import { prisma } from "./db/prisma.ts";
 import { authRoutes } from "./module/auth/auth.routes.ts";
 import ticketRoutes from "./module/tickets/ticket.routes.ts";
 import { userRoutes } from "./module/users/user.routes.ts";
+import { rateLimter } from "./middleware/ratelimiter.middleware.ts";
 
 const app = express();
 
 app.use(helmet());
+app.use(rateLimter());
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "1kb" }));
 app.use(morgan("dev"));
 app.use(requestLogger);
 
