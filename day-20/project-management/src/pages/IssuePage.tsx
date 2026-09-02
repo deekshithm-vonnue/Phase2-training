@@ -11,6 +11,7 @@ interface RawMockIssue {
   dueDate?: string | null;
   assignedTo?: string;
 }
+
 export default function RenderIssueList() {
   const validIssues = (mockData.issues as RawMockIssue[]).map((issue) => {
     return {
