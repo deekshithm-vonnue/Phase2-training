@@ -16,7 +16,6 @@
 
 #root {
   max-width: 100%;
-  text-align: center;
   background-color: var(--bg);
   border-inline: 1px solid var(--border);
   min-height: 100svh;
@@ -27,6 +26,7 @@
 
 body {
   margin: 0;
+  padding: 0;
 }
 
 

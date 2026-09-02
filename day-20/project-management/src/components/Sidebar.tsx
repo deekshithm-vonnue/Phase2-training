@@ -1,9 +1,9 @@
 import "../styles/sidebar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faFolderOpen,       
-  faCircleExclamation, 
-  faUser,              
+  faFolderOpen,
+  faCircleExclamation,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
 interface SideBarProps {
@@ -11,6 +11,7 @@ interface SideBarProps {
 }
 
 function SiderBar({ isOpen }: SideBarProps) {
+  // useEffect()
   return (
     <div className={`sidebar ${isOpen ? "open" : "close"}`}>
       <nav className="sidebar-nav">
@@ -26,10 +27,7 @@ function SiderBar({ isOpen }: SideBarProps) {
           <span>Issues</span>
         </div>
         <div className="sidebar-item">
-          <FontAwesomeIcon
-            icon={faUser}
-            className="sidebar-icon"
-          />
+          <FontAwesomeIcon icon={faUser} className="sidebar-icon" />
           <span>Profile</span>
         </div>
       </nav>

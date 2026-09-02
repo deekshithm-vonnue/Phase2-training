@@ -2,7 +2,7 @@ import { Badge } from "./Badge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
-import "../styles/project.css"
+import "../styles/project.css";
 type StatusType = "Pending" | "In_Progress" | "Completed";
 interface ProjectProps {
   title: string;
@@ -14,7 +14,7 @@ interface ProjectProps {
 export default function ProjectCard({
   title,
   description,
-  priority ="Medium",
+  priority = "Medium",
   status = "Pending",
   dueDate,
 }: ProjectProps) {
@@ -30,10 +30,14 @@ export default function ProjectCard({
     }
   };
 
+  const [today] = useState(new Date());
   return (
     <div className="project-card">
       <div className="project-card-header">
         <div className="project-title">{title || "Project Title"}</div>
+        {today > dueDate! && currentStatus !== "Completed" && (
+          <Badge text={"overdue"} variant={"urgent".toLowerCase() || "info"} />
+        )}
         <Badge
           text={priority || "Medium"}
           variant={priority?.toLowerCase() || "info"}
@@ -58,7 +62,11 @@ export default function ProjectCard({
           </div>
           <div className="project-card-status">
             <span className="project-card-status-label">Status </span>
-            <span className={`project-card-status-value project-card-status-value-${currentStatus.toLowerCase()}`}>{currentStatus}</span>
+            <span
+              className={`project-card-status-value project-card-status-value-${currentStatus.toLowerCase()}`}
+            >
+              {currentStatus}
+            </span>
           </div>
         </div>
       </div>

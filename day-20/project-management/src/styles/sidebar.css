@@ -19,6 +19,7 @@
 .sidebar.open {
   /* transform: translateY(-50%) translateX(5px); */
   transform: translateX(0px);
+  /* overflow: hidden; */
 }
 
 .sidebar.close {

@@ -1,7 +1,7 @@
 .project-card {
   background-color: #1a1a1a;
   border-radius: 12px;
-  max-width: 450px;
+  /* max-width: 450px; */
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -121,15 +121,26 @@
   transform: scale(0.98);
 }
 
-
 .project-card-status-value-pending {
-  color: #e75d00; 
+  color: #e75d00;
 }
 
 .project-card-status-value-in_progress {
-  color: #eb25db; 
+  color: #eb25db;
 }
 
 .project-card-status-value-completed {
-  color: #16a34a; 
+  color: #16a34a;
+}
+
+.project-page-layout {
+  margin-top: 120px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding-inline: 10px;
+}
+
+.empty-project {
+  margin-top: 120px;
 }

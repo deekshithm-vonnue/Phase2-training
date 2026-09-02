@@ -3,8 +3,9 @@ import { Badge } from "./Badge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Avatar } from "./Avatar";
-import "../styles/issue.css"
-type StatusType = "Pending" | "In_Progress" | "Completed";
+import "../styles/issue.css";
+
+export type StatusType = "Pending" | "In_Progress" | "Completed";
 
 interface IssueProps {
   title: string;
@@ -12,7 +13,7 @@ interface IssueProps {
   priority?: "High" | "Low" | "Medium" | "Urgent";
   status?: StatusType;
   dueDate?: Date;
-  assignedTo?: string; // Declared assignment target string
+  assignedTo?: string;
 }
 
 export default function IssueCard({
@@ -21,7 +22,7 @@ export default function IssueCard({
   priority = "Medium",
   status = "Pending",
   dueDate,
-  assignedTo = "Unassigned", // 1. Added a default value fallback
+  assignedTo = "Unassigned",
 }: IssueProps) {
   const [currentStatus, setCurrentStatus] = useState<StatusType>(status);
 
@@ -35,10 +36,16 @@ export default function IssueCard({
     }
   };
 
+  // const [today] = useState(() => new Date());
+  const today = new Date();
+
   return (
     <div className="issue-card">
       <div className="issue-card-header">
         <div className="issue-title">{title || "Issue Title"}</div>
+        {today > dueDate! && currentStatus !== "Completed" && (
+          <Badge text={"Overdue"} variant={"urgent".toLowerCase()} />
+        )}
         <Badge text={priority} variant={priority.toLowerCase()} />
         <button className="edit" aria-label="Edit issue">
           <FontAwesomeIcon icon={faPenToSquare} />
@@ -47,37 +54,41 @@ export default function IssueCard({
           <FontAwesomeIcon icon={faTrash} />
         </button>
       </div>
+
       <div className="issue-card-body">
         <p className="issue-card-description">
           {description || "No description provided."}
         </p>
 
         <div className="issue-card-assignee">
-            Assigned To
+          <span>Assigned To</span>
           <Avatar src="" name={assignedTo} />
           <span className="assignee-name">{assignedTo}</span>
         </div>
 
-        <div className="issue-card-meta">
-          <div className="issue-card-date">
-            <span className="issue-card-date-label">Issue Date</span>
-            <span className="issue-card-date-value">
-              {dueDate ? dueDate.toLocaleDateString() : "TBD"}
-            </span>
+        <div className="issue-card-footer-group">
+          <div className="issue-card-meta">
+            <div className="issue-card-date">
+              <span className="issue-card-date-label">DUE Date </span>
+              <span className="issue-card-date-value">
+                {dueDate ? dueDate.toLocaleDateString() : "TBD"}
+              </span>
+            </div>
+            <div className="issue-card-status">
+              <span className="issue-card-status-label">Status</span>
+              <span
+                className={`issue-card-status-value issue-card-status-value-${currentStatus.toLowerCase()}`}
+              >
+                {currentStatus.replace("_", " ")}
+              </span>
+            </div>
           </div>
-          <div className="issue-card-status">
-            <span className="issue-card-status-label">Status</span>
-            <span
-              className={`issue-card-status-value issue-card-status-value-${currentStatus.toLowerCase()}`}
-            >
-              {currentStatus.replace("_", " ")}
-            </span>
-          </div>
+
+          <button className="btn-update" onClick={handleUpdateStatus}>
+            update status
+          </button>
         </div>
       </div>
-      <button className="btn-update" onClick={handleUpdateStatus}>
-        update status
-      </button>
     </div>
   );
 }
