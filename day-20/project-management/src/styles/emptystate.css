@@ -8,8 +8,8 @@
   border: 2px dashed #333333;
   border-radius: 12px;
   text-align: center;
-  max-width: 400px;
   margin: 40px auto;
+  width: 80%;
 }
 
 .empty-state-icon {

@@ -20,8 +20,8 @@ function App() {
         <SiderBar isOpen={isSidebarOpen} />
         {/* <ProjectCard title="create login page" description="This is a login page with all the neccesay things   whargfdushuzkd lhidgfschk roihdfgcv"/>
         <IssueCard title="create login page" description="This is a login page with all the neccesay things   whargfdushuzkd lhidgfschk roihdfgcv"/> */}
-        {/* <RenderIssueList /> */}
-        <RenderProjectList />
+        <RenderIssueList />
+        {/* <RenderProjectList /> */}
       </main>
     </>
   );

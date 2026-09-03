@@ -13,7 +13,7 @@ function Header({ onClick }: HeaderProps) {
         className="hamburger-icon"
         onClick={onClick}
       />
-      <div className="headline-content">DashBroad</div>
+      <div className="headline-content">DashBoard</div>
     </header>
   );
 }
