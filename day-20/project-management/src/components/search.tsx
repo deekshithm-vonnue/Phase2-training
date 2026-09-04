@@ -8,7 +8,11 @@ interface SearchFilterProps {
 function SearchFilter({ searchTerm, setSearchTerm }: SearchFilterProps) {
   return (
     <div className="search-filter-container">
+      <label htmlFor="search" hidden>
+        Search{" "}
+      </label>
       <input
+        id="search"
         type="search"
         placeholder="Search"
         className="search-filter-input"

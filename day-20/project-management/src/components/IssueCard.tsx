@@ -4,26 +4,35 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Avatar } from "./Avatar";
 import "../styles/issue.css";
+import type { LabelType } from "./Form";
 
 export type StatusType = "Pending" | "In_Progress" | "Completed";
 
-interface IssueProps {
+export interface IssueProps {
   title: string;
   description: string;
   priority?: "High" | "Low" | "Medium" | "Urgent";
   status?: StatusType;
   dueDate?: Date;
   assignedTo?: string;
+  label?: LabelType;
+}
+
+interface CardComponentProps extends IssueProps {
+  id: string | number;
+  onEditClick: (id: string | number) => void;
 }
 
 export default function IssueCard({
+  id,
   title,
   description,
   priority = "Medium",
   status = "Pending",
   dueDate,
   assignedTo = "Unassigned",
-}: IssueProps) {
+  onEditClick,
+}: CardComponentProps) {
   const [currentStatus, setCurrentStatus] = useState<StatusType>(status);
 
   const handleUpdateStatus = () => {
@@ -47,10 +56,10 @@ export default function IssueCard({
           <Badge text={"Overdue"} variant={"urgent".toLowerCase()} />
         )}
         <Badge text={priority} variant={priority.toLowerCase()} />
-        <button className="edit" aria-label="Edit issue">
+        <button className="edit" onClick={() => onEditClick(id)}>
           <FontAwesomeIcon icon={faPenToSquare} />
         </button>
-        <button className="delete" aria-label="Delete issue">
+        <button className="delete">
           <FontAwesomeIcon icon={faTrash} />
         </button>
       </div>

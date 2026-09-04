@@ -1,7 +1,10 @@
 import { useState, type ChangeEvent } from "react";
 import mockData from "../../mockdata.json";
 import { EmptyState } from "../components/EmptyState";
-import IssueCard, { type StatusType } from "../components/IssueCard";
+import IssueCard, {
+  type IssueProps,
+  type StatusType,
+} from "../components/IssueCard";
 import SearchFilter from "../components/search";
 import Filter, { type FilterOption } from "../components/Filter";
 import Button from "../components/Button";
@@ -29,7 +32,7 @@ export default function RenderIssueList() {
   const statusOptions: FilterOption[] = [
     { label: "All", value: "All" },
     { label: "Pending", value: "Pending" },
-    { label: "In_progress", value: "In_progress" },
+    { label: "In Progress", value: "In_Progress" },
     { label: "Completed", value: "Completed" },
   ];
 
@@ -38,18 +41,30 @@ export default function RenderIssueList() {
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [sortOrder, setSortOrder] = useState("desc");
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+  const [editingIssue, setEditingIssue] = useState<
+    (IssueProps & { id: string | number }) | null
+  >(null);
 
-  const handleSortOrdering = () => {
-    if (sortOrder == "desc") {
-      setSortOrder("asc");
-    } else {
-      setSortOrder("desc");
+  const handleOpenEditModal = (id: string | number) => {
+    const targetIssue = issues.find((issue) => issue.id === id);
+    if (targetIssue) {
+      setEditingIssue(targetIssue);
+      setIsFormOpen(true);
     }
+  };
+  const handleSortOrdering = () => {
+    setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"));
   };
 
   const handleReset = () => {
     setSelectedPriority("All");
     setSelectedStatus("All");
+    setSearchTerm("");
+  };
+
+  const handleOpenModal = () => {
+    setEditingIssue(null);
+    setIsFormOpen(true);
   };
 
   function handlePriorityChange(event: ChangeEvent<HTMLSelectElement>) {
@@ -60,33 +75,72 @@ export default function RenderIssueList() {
     setSelectedStatus(event.target.value);
   }
 
-  const validIssues = (mockData.issues as RawMockIssue[]).map((issue) => {
-    return {
-      id: issue.id,
-      title: issue.title,
-      description: issue.description,
-      priority:
-        (issue.priority as "Urgent" | "High" | "Medium" | "Low") || "Medium",
-      status: (issue.status as StatusType) || "Pending",
-      dueDate: issue.dueDate ? new Date(issue.dueDate) : undefined,
-      assignedTo: issue.assignedTo || "Unassigned",
-    };
-  });
+  const handleCancelClick = () => {
+    const confirmDiscard = window.confirm(
+      "You have unsaved changes. Are you sure you want to close this form?",
+    );
+    if (confirmDiscard) {
+      setIsFormOpen(false);
+      setEditingIssue(null);
+    }
+  };
 
-  const sortIssue = validIssues.sort((a, b) => {
+  const validIssues = (mockData.issues as RawMockIssue[]).map((issue) => ({
+    id: issue.id,
+    title: issue.title,
+    description: issue.description,
+    priority:
+      (issue.priority as "Urgent" | "High" | "Medium" | "Low") || "Medium",
+    status: (issue.status as StatusType) || "Pending",
+    dueDate: issue.dueDate ? new Date(issue.dueDate) : undefined,
+    assignedTo: issue.assignedTo || "Unassigned",
+  }));
+
+  const [issues, setIssues] =
+    useState<(IssueProps & { id: string | number })[]>(validIssues);
+
+  const handleSaveIssue = (
+    newIssueData: IssueProps & { id?: string | number },
+  ) => {
+    if (newIssueData.id) {
+      setIssues((prevIssues) =>
+        prevIssues.map((item) =>
+          item.id === newIssueData.id ? { ...item, ...newIssueData } : item,
+        ),
+      );
+    } else {
+      const newIssue = {
+        ...newIssueData,
+        id: crypto.randomUUID(),
+      };
+      setIssues((prevIssue) => [...prevIssue, newIssue]);
+      // setIsFormOpen(false);
+    }
+    setIsFormOpen(false);
+    setEditingIssue(null)
+  };
+
+  const sortedIssues = [...issues].sort((a, b) => {
     if (!a.dueDate) return 1;
     if (!b.dueDate) return -1;
-    if (sortOrder == "asc") return a.dueDate.getTime() - b.dueDate.getTime();
-    else return b.dueDate.getTime() - a.dueDate.getTime();
+    return sortOrder === "asc"
+      ? a.dueDate.getTime() - b.dueDate.getTime()
+      : b.dueDate.getTime() - a.dueDate.getTime();
   });
-  const searchedIssue = sortIssue.filter((issue) => {
+
+  const searchedIssue = sortedIssues.filter((issue) => {
     const matchesPriority =
       selectedPriority.toLowerCase() === "all" ||
-      issue.priority.toLowerCase() === selectedPriority.toLowerCase();
+      issue.priority!.toLowerCase() === selectedPriority.toLowerCase();
+
+    const normalizedIssueStatus = issue.status!.toLowerCase().replace("_", "");
+    const normalizedSelectedStatus = selectedStatus
+      .toLowerCase()
+      .replace("_", "");
 
     const matchesStatus =
-      selectedStatus.toLowerCase() == "all" ||
-      issue.status.toLowerCase() === selectedStatus.toLowerCase();
+      selectedStatus.toLowerCase() === "all" ||
+      normalizedIssueStatus === normalizedSelectedStatus;
 
     const query = searchTerm.trim().toLowerCase();
     const matchesSearch =
@@ -98,6 +152,13 @@ export default function RenderIssueList() {
 
   return (
     <div className="issuePage">
+      {isFormOpen && (
+        <Form
+          onClose={handleCancelClick}
+          onAddIssue={handleSaveIssue}
+          initialData={editingIssue || undefined}
+        />
+      )}
       <div className="filter-controls-header">
         <SearchFilter searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
@@ -114,12 +175,14 @@ export default function RenderIssueList() {
             selectedValue={selectedStatus}
             handleFilter={handleStatusChange}
           />
-          <Button handleFunction={handleSortOrdering}>sort</Button>
-          <Button handleFunction={handleReset}>clear filter</Button>
+          <Button handleFunction={handleSortOrdering}>
+            Sort ({sortOrder === "asc" ? "Oldest" : "Newest"})
+          </Button>
+          <Button handleFunction={handleReset}>Clear Filter</Button>
         </div>
-        <Button handleFunction={() => setIsFormOpen(true)}>Add issue</Button>
+        <Button handleFunction={handleOpenModal}>Add Issue</Button>
       </div>
-      {isFormOpen && <Form />}
+
       {searchedIssue.length === 0 ? (
         <EmptyState type="issues" />
       ) : (
@@ -127,12 +190,14 @@ export default function RenderIssueList() {
           {searchedIssue.map((issue) => (
             <IssueCard
               key={issue.id}
+              id={issue.id}
               title={issue.title}
               description={issue.description}
               priority={issue.priority}
               status={issue.status}
               dueDate={issue.dueDate}
               assignedTo={issue.assignedTo}
+              onEditClick={handleOpenEditModal}
             />
           ))}
         </div>

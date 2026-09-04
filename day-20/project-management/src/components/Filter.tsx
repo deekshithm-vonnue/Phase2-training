@@ -18,11 +18,16 @@ export default function Filter({
   selectedValue,
   handleFilter,
 }: FilterProps) {
+  const uniqueId = `filter-${type.toLowerCase()}`;
+
   return (
     <div className="filter-wrapper">
-      <label className="filter-label">{type} </label>
+      <label className="filter-label" htmlFor={uniqueId}>
+        {type}{" "}
+      </label>
 
       <select
+        id={uniqueId}
         name={`filter-${type.toLowerCase()}`}
         className="filter-select"
         value={selectedValue}

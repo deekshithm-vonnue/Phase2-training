@@ -1,3 +1,132 @@
-.form{
-    background-color: aliceblue;
+/* done reset hard and css completely gone */
+
+.form-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); 
+  backdrop-filter: blur(4px);           
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.issue-creation-form {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  border-radius: 12px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-y: auto;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.form-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+}
+
+.form-header-row h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.close-x-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.close-x-btn:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+.form-group-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-group-field label {
+  font-size: 0.875rem;
+  font-weight: 550;
+  color: #374151;
+  text-transform: capitalize;
+}
+
+.form-group-field input[type="text"],
+.form-group-field input[type="date"],
+.form-group-field textarea,
+.form-group-field select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.95rem;
+  color: #1f2937;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+}
+
+.form-group-field input:focus,
+.form-group-field textarea:focus,
+.form-group-field select:focus {
+  border-color: #3b82f6; 
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  background-color: #ffffff;
+}
+
+.form-group-field textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.error-layout {
+  font-size: 0.8rem;
+  color: #dc2626; 
+  min-height: 1.1rem; 
+  margin-top: 0.15rem;
+}
+
+.form-group-field:has(.error-layout:not(:empty)) input,
+.form-group-field:has(.error-layout:not(:empty)) textarea,
+.form-group-field:has(.error-layout:not(:empty)) select {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.sumbit-button {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.sumbit-button button {
+  padding: 0.65rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
 }
