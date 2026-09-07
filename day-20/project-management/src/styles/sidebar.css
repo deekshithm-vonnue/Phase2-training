@@ -35,6 +35,9 @@
 }
 
 .sidebar-item {
+  appearance: none;
+  text-decoration: none;
+  color: #fff;
   display: flex;
   justify-content: start;
   padding-left: 24px;

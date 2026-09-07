@@ -5,31 +5,33 @@ import {
   faCircleExclamation,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-
+import { Link } from "react-router-dom";
 interface SideBarProps {
   isOpen: boolean;
+  handleClose: ()=> void
 }
 
-function SiderBar({ isOpen }: SideBarProps) {
+function SiderBar({ isOpen,handleClose }: SideBarProps) {
   // useEffect()
   return (
     <div className={`sidebar ${isOpen ? "open" : "close"}`}>
       <nav className="sidebar-nav">
-        <div className="sidebar-item">
+        <Link to="/projects" className="sidebar-item" onClick={handleClose}>
           <FontAwesomeIcon icon={faFolderOpen} className="sidebar-icon" />
           <span>Projects</span>
-        </div>
-        <div className="sidebar-item">
+        </Link>
+        <Link to="/issues" className="sidebar-item"  onClick={handleClose}>
           <FontAwesomeIcon
             icon={faCircleExclamation}
             className="sidebar-icon"
           />
           <span>Issues</span>
-        </div>
-        <div className="sidebar-item">
+        </Link>
+        <Link to="/profile" className="sidebar-item"  onClick={handleClose}>
           <FontAwesomeIcon icon={faUser} className="sidebar-icon" />
           <span>Profile</span>
-        </div>
+        </Link>
+      
       </nav>
     </div>
   );

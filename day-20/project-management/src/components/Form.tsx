@@ -81,7 +81,6 @@ export default function Form({ onClose, onAddIssue, initialData }: FormProps) {
     e.preventDefault();
 
     const isValid = validateForm();
-    console.log("ds")
     if (!isValid) {
       return;
     }

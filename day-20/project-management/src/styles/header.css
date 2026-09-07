@@ -1,6 +1,6 @@
 .header-container {
   position: fixed;
-  width: 100%;
+  width: 95%;
   display: flex;
   justify-content: start;
   align-items: center;
@@ -21,4 +21,11 @@
   font-size: 30px;
   cursor: pointer;
   color: #ffffff;
+}
+
+.login-style{
+  display: flex;
+  justify-content: flex-end;
+  color: #ffffff;
+  
 }

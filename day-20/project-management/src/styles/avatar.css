@@ -2,13 +2,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 302px;
+  height: 302px;
   border-radius: 50%;
   background-color: #3b82f6;
   color: #ffffff;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 106px;
   overflow: hidden;
   flex-shrink: 0;
 }

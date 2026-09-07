@@ -3,10 +3,13 @@
 import { useState } from "react";
 import Header from "./components/Header";
 import SiderBar from "./components/Sidebar";
-import ProjectCard from "./components/ProjectCard";
-import IssueCard from "./components/IssueCard";
 import RenderIssueList from "./pages/IssuePage";
 import RenderProjectList from "./pages/Project";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { LoginPage } from "./pages/LoginPage";
+import { ProfilePage } from "./pages/ProfilePage";
+import { NotFound } from "./components/NotFound";
+import { IssueDetail } from "./components/IssueDetails";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -14,16 +17,20 @@ function App() {
     setIsSidebarOpen(!isSidebarOpen);
   };
   return (
-    <>
+    <BrowserRouter>
       <Header onClick={toggleSidebar} />
       <main>
-        <SiderBar isOpen={isSidebarOpen} />
-        {/* <ProjectCard title="create login page" description="This is a login page with all the neccesay things   whargfdushuzkd lhidgfschk roihdfgcv"/>
-        <IssueCard title="create login page" description="This is a login page with all the neccesay things   whargfdushuzkd lhidgfschk roihdfgcv"/> */}
-        <RenderIssueList />
-        {/* <RenderProjectList /> */}
+        <SiderBar isOpen={isSidebarOpen} handleClose={toggleSidebar} />
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/projects" element={<RenderProjectList />} />
+          <Route path="/issues" element={<RenderIssueList />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/issues/:issueId" element={<IssueDetail />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </main>
-    </>
+    </BrowserRouter>
   );
 }
 

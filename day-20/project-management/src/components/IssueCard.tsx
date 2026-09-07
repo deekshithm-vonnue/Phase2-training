@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Badge } from "./Badge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { Avatar } from "./Avatar";
 import "../styles/issue.css";
 import type { LabelType } from "./Form";
+import { useNavigate } from "react-router-dom";
 
 export type StatusType = "Pending" | "In_Progress" | "Completed";
 
@@ -34,7 +34,11 @@ export default function IssueCard({
   onEditClick,
 }: CardComponentProps) {
   const [currentStatus, setCurrentStatus] = useState<StatusType>(status);
+  const navigate = useNavigate();
 
+  const handleDetails = () => {
+    navigate(`/issues/${id}`);
+  };
   const handleUpdateStatus = () => {
     if (currentStatus === "Pending") {
       setCurrentStatus("In_Progress");
@@ -64,14 +68,13 @@ export default function IssueCard({
         </button>
       </div>
 
-      <div className="issue-card-body">
-        <p className="issue-card-description">
+      <div className="issue-card-body" >
+        <p className="issue-card-description" onClick={handleDetails}>
           {description || "No description provided."}
         </p>
 
-        <div className="issue-card-assignee">
+        <div className="issue-card-assignee" onClick={handleDetails}>
           <span>Assigned To</span>
-          <Avatar src="" name={assignedTo} />
           <span className="assignee-name">{assignedTo}</span>
         </div>
 
