@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import { EmptyState } from "../components/EmptyState";
 import IssueCard, { type IssueProps } from "../components/IssueCard";
 import SearchFilter from "../components/search";
@@ -6,7 +6,8 @@ import Filter, { type FilterOption } from "../components/Filter";
 import Button from "../components/Button";
 import Form from "../components/Form";
 import type { Issue } from "../types/project";
-import { issueApi } from "../apiclient/issueapi";
+import { useDebounce } from "../hooks/debounce.hook";
+import { useIssues } from "../hooks/issues.hook";
 
 export default function RenderIssueList() {
   const priorityOptions: FilterOption[] = [
@@ -32,6 +33,7 @@ export default function RenderIssueList() {
   const [editingIssue, setEditingIssue] = useState<
     (IssueProps & { id: string }) | null
   >(null);
+  const debouncedSearch = useDebounce(searchTerm, 2000);
 
   const handleOpenEditModal = (id: string | number) => {
     const targetIssue = issues.find((issue) => issue.id === id);
@@ -73,35 +75,12 @@ export default function RenderIssueList() {
     }
   };
 
-  const [issues, setIssues] = useState<Issue[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadIssues = async () => {
-      try {
-        setLoading(true);
-        const data = await issueApi.getAll();
-        const parsedIssues = data.map((issue) => ({
-          ...issue,
-          dueDate: new Date(issue.dueDate),
-        }));
-
-        setIssues(parsedIssues);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load projects",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadIssues();
-  }, [setIssues]);
+  const { issues, isLoading, error, refetch } = useIssues();
+  const [localModifications, setLocalModifications] = useState<Issue[]>([]);
 
   const handleSaveIssue = (newIssueData: IssueProps & { id?: string }) => {
     if (newIssueData.id) {
-      setIssues((prevIssues) =>
+      setLocalModifications((prevIssues) =>
         prevIssues.map((item) => {
           if (item.id === newIssueData.id) {
             return {
@@ -130,13 +109,22 @@ export default function RenderIssueList() {
         projectId: "local-project-context",
         label: newIssueData.label,
       };
-      setIssues((prevIssue) => [...prevIssue, newIssue]);
+      setLocalModifications((prevIssue) => [...prevIssue, newIssue]);
     }
     setIsFormOpen(false);
     setEditingIssue(null);
   };
 
-  const sortedIssues = [...issues].sort((a, b) => {
+  const combinedIssues = [
+    ...localModifications.filter(
+      (local) => !issues.some((b) => b.id === local.id),
+    ),
+    ...issues.map(
+      (base) => localModifications.find((m) => m.id === base.id) || base,
+    ),
+  ];
+
+  const sortedIssues = [...combinedIssues].sort((a, b) => {
     if (!a.dueDate) return 1;
     if (!b.dueDate) return -1;
     return sortOrder === "asc"
@@ -158,16 +146,21 @@ export default function RenderIssueList() {
       selectedStatus.toLowerCase() === "all" ||
       normalizedIssueStatus === normalizedSelectedStatus;
 
-    const query = searchTerm.trim().toLowerCase();
+    const query = debouncedSearch.trim().toLowerCase();
     const matchesSearch =
       issue.title.toLowerCase().includes(query) ||
       issue.description.toLowerCase().includes(query);
 
     return matchesStatus && matchesSearch && matchesPriority;
   });
-
-  if (loading) return <div className="loading-state"></div>;
-  if (error) return <div className="error-state">UNAVAIL</div>;
+  if (isLoading) return <div className="loading-state"></div>;
+  if (error)
+    return (
+      <div className="error-state">
+        <p>Error: {error}</p>
+        <button onClick={refetch}>Try Again</button>
+      </div>
+    );
   return (
     <div className="issuePage">
       {isFormOpen && (

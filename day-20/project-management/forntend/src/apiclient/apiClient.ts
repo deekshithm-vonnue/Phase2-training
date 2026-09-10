@@ -1,9 +1,9 @@
-
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const apiRequest = async <T>(
   url: string,
   method: "GET" | "POST" | "PUT" | "DELETE",
+  options?: Omit<RequestInit, "method" | "headers" | "body">,
   data?: unknown,
 ): Promise<T> => {
   const fullUrl = new URL(url, BASE_URL).href;
@@ -13,6 +13,7 @@ export const apiRequest = async <T>(
     headers: {
       "content-Type": "application/json",
     },
+    ...options,
   };
 
   if (data !== undefined && method !== "GET") {

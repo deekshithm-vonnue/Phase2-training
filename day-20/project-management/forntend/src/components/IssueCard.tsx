@@ -3,6 +3,7 @@ import { Badge } from "./Badge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "../styles/issue.css";
+import "../styles/project.css"
 import type { LabelType } from "./Form";
 import { useNavigate } from "react-router-dom";
 

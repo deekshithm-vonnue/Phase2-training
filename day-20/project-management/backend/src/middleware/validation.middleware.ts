@@ -31,21 +31,22 @@ export function validation(schemas: RequestSchemas) {
         );
       }
 
-      if (schemas.body) {
+      if (schemas.params) {
         assignRequestProperty(
           request,
           "params",
-          schemas.body.parse(request.params),
+          schemas.params.parse(request.params),
         );
       }
 
-      if (schemas.body) {
+      if (schemas.query) {
         assignRequestProperty(
           request,
           "query",
-          schemas.body.parse(request.query),
+          schemas.query.parse(request.query),
         );
       }
+      next();
     } catch (error) {
       if (error instanceof ZodError) {
         return next(error);

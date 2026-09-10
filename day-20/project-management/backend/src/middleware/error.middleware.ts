@@ -28,6 +28,7 @@ export function errorHandler(
       error: {
         code: "VALIDATION_ERROR",
         message: "Request validation failed",
+        details: error.flatten(),
       },
     });
     return;
@@ -56,7 +57,7 @@ export function errorHandler(
   response.status(500).json({
     error: {
       code: "INTERNAL_SERVER_ERROR",
-      message: "Unexpected error",
+      message: error instanceof Error ? error.message : "Unexpected error",
     },
   });
 }

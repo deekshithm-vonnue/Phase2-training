@@ -1,43 +1,26 @@
-import { useEffect, useState } from "react";
-import mockData from "../../mockdata.json";
 import { EmptyState } from "../components/EmptyState";
 import ProjectCard from "../components/ProjectCard";
-import type{ Project } from "../types/project";
-import { projectApi } from "../apiclient/projectapi";
+import { useProjects } from "../hooks/project.hook";
 
 export default function RenderProjectList() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { projects, isLoading, error, refetch } = useProjects();
 
-  useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        setLoading(true);
-        const data = await projectApi.getAll();
-        setProjects(data);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load projects",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+  if (isLoading) return <div className="loading-state"></div>;
+  if (error)
+    return (
+      <div className="error-state">
+        <p>Error: {error}</p>
+        <button onClick={refetch}>Try Again</button>
+      </div>
+    );
 
-    loadProjects();
-  }, []);
-  if (mockData.projects.length == 0) {
+  if (Array.from(projects).length == 0) {
     return (
       <div className="empty-project">
         <EmptyState type="projects" />
       </div>
     );
   }
-  // console.log(projects)
-    if (loading) return <div className="loading-state"></div>;
-  if (error) return <div className="error-state">UNAVAIL</div>;
-
   return (
     <div className="project-page-layout">
       {Array.from(projects).map((project) => (

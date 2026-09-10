@@ -161,3 +161,7 @@ border-radius: 50%;
     transform: rotate(360deg);
   }
 }
+.error-state{
+  margin-top: 140px;
+  color: red;
+}

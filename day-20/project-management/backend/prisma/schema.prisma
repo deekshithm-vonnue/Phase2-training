@@ -46,3 +46,10 @@ model Issue {
   projectId   String
   createdFor  Project  @relation(fields: [projectId], references: [id])
 }
+
+model USER {
+  id           String @id @default(uuid())
+  name         String
+  email        String  @unique
+  passwordHash String
+}
