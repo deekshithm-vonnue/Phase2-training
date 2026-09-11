@@ -1,11 +1,20 @@
 import { useState } from "react";
 import Button from "../components/Button";
 import "../styles/login.css";
+import { authApi } from "../apiclient/authapi";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
+// import { authApi } from "../apiclient/authapi";
 
 export function LoginPage() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [error, setError] = useState<Record<string, string>>({});
+
+  const navigate = useNavigate();
+
+  const { login } = useAuth();
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
 
@@ -29,6 +38,12 @@ export function LoginPage() {
     if (!isValid) {
       return;
     }
+    const loginData = { email: email, password: password };
+
+    authApi.login(undefined, loginData).then((response) => {
+      login(response.user, response.token, rememberMe);
+      navigate("/projects");
+    });
   };
   return (
     <div className="login-layout">
@@ -62,6 +77,18 @@ export function LoginPage() {
               }}
             />
             <div className="error-layout">{error.password}</div>
+          </div>
+
+          <div className="remember-field">
+            <input
+              id="remember"
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => {
+                setRememberMe(e.target.checked);
+              }}
+            />
+            <label htmlFor="remember">Remember Me</label>
           </div>
           <Button type="submit">Login</Button>
         </form>

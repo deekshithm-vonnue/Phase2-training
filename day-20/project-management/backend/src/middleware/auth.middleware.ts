@@ -18,6 +18,7 @@ export function requireAuth(
 
     const token = authHeader.replace(`Bearer `, "");
     (request as AuthenticateUser).user = verifyToken(token);
+    next();
   } catch {
     next(new UnauthorizedError());
   }

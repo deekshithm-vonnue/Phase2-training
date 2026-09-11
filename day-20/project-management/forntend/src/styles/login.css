@@ -35,3 +35,10 @@ hr {
 .error-layout {
   font-size: 18px;
 }
+
+.remember-field {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  gap: 6px;
+}

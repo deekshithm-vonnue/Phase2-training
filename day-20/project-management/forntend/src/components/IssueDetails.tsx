@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import "../styles/issue.css";
 import { NotFound } from "./NotFound";
-import { useIssue } from "../apiclient/test";
+import { useIssue } from "../hooks/issue.hooks";
 export function IssueDetail() {
   const { issueId } = useParams();
   const { issue, isLoading, error, refetch } = useIssue(issueId);

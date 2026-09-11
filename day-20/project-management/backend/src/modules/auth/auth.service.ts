@@ -55,7 +55,6 @@ export class AuthService {
 
   async getCurrentUser(userId: string) {
     const user = await repository.findUserByID(userId);
-
     return safeUser(user);
   }
 }

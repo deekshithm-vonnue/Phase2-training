@@ -18,6 +18,7 @@ export class AuthController {
   }
 
   async me(request: Request, response: Response) {
+    console.log("hdf")
     const authRequest = request as AuthenticateUser;
     const user = await authService.getCurrentUser(authRequest.user!.userId);
     response.json({ data: user });

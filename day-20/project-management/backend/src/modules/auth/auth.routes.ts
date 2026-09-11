@@ -10,7 +10,7 @@ authRoutes.post(
   "/register",
   validation({ body: registerSchema }),
   (req, res, next) => {
-    console.log("ehh")
+    console.log("ehh");
     authController.register(req, res).catch(next);
   },
 );

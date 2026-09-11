@@ -8,11 +8,18 @@ export const apiRequest = async <T>(
 ): Promise<T> => {
   const fullUrl = new URL(url, BASE_URL).href;
 
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+  const headers: Record<string, string> = {
+    "content-Type": "application/json",
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
   const config: RequestInit = {
     method,
-    headers: {
-      "content-Type": "application/json",
-    },
+    headers,
     ...options,
   };
 
