@@ -11,6 +11,7 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { NotFound } from "./components/NotFound";
 import { IssueDetail } from "./components/IssueDetails";
 import ProctectRoute from "./components/ProtectedRoute";
+import SideBar from "./components/Sidebar";
 
 const AuthenticatedLayout = ({
   isOpen,
@@ -23,7 +24,7 @@ const AuthenticatedLayout = ({
     <>
       <Header onClick={onToggle} />
       <main>
-        <SiderBar isOpen={isOpen} handleClose={onToggle} />
+        <SideBar isOpen={isOpen} handleClose={onToggle} />
         <Outlet />
       </main>
     </>

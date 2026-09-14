@@ -7,7 +7,6 @@ export const authService = new AuthService();
 
 export class AuthController {
   async register(request: Request, response: Response) {
-    console.log("heel")
     const result = await authService.register(request.body as RegisterInput);
     response.status(201).json({ data: result });
   }
@@ -18,7 +17,6 @@ export class AuthController {
   }
 
   async me(request: Request, response: Response) {
-    console.log("hdf")
     const authRequest = request as AuthenticateUser;
     const user = await authService.getCurrentUser(authRequest.user!.userId);
     response.json({ data: user });

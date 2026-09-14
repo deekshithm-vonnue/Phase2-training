@@ -56,7 +56,6 @@ export function LoginPage() {
             <input
               placeholder="Email"
               id="email"
-              type="email"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);

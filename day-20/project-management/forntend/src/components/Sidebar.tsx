@@ -13,38 +13,41 @@ interface SideBarProps {
   handleClose: () => void;
 }
 
-function SiderBar({ isOpen, handleClose }: SideBarProps) {
+function SideBar({ isOpen, handleClose }: SideBarProps) {
   const [title, setTitle] = useState<string>("DashBoard");
   useDocumentTitle(title);
 
+    const handleNewClick =(newTitle: string)=>{
+      handleClose();
+      setTitle(newTitle)
+    }
   return (
     <div className={`sidebar ${isOpen ? "open" : "close"}`}>
       <nav className="sidebar-nav">
         <NavLink
           to="/projects"
           className="sidebar-item"
-          onClick={() => {
-            handleClose();
-            setTitle("Project");
-          }}
+          onClick={() => handleNewClick("Projects")}
         >
           <FontAwesomeIcon icon={faFolderOpen} className="sidebar-icon" />
           <span>Projects</span>
         </NavLink>
-        <NavLink to="/issues" className="sidebar-item"   onClick={() => {
-            handleClose();
-            setTitle("Issues");
-          }}>
+        <NavLink
+          to="/issues"
+          className="sidebar-item"
+          onClick={() =>  handleNewClick("Issues")}
+        >
           <FontAwesomeIcon
             icon={faCircleExclamation}
             className="sidebar-icon"
           />
           <span>Issues</span>
         </NavLink>
-        <NavLink to="/profile" className="sidebar-item"    onClick={() => {
-            handleClose();
-            setTitle("Profile");
-          }}>
+        <NavLink
+          to="/profile"
+          className="sidebar-item"
+          onClick={() =>  handleNewClick("Profile")}
+        >
           <FontAwesomeIcon icon={faUser} className="sidebar-icon" />
           <span>Profile</span>
         </NavLink>
@@ -53,4 +56,4 @@ function SiderBar({ isOpen, handleClose }: SideBarProps) {
   );
 }
 
-export default SiderBar;
+export default SideBar;
