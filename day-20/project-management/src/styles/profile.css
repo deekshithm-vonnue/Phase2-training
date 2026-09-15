@@ -1,0 +1,26 @@
+.profile-layout {
+  margin-top: 140px;
+  display: flex;
+  justify-content: center;
+  color: white;
+}
+
+.profile-container {
+  background-color: rgba(59, 130, 246, 0.12);
+  border: 1px solid black;
+
+  box-shadow: 1px 1px 8px 2px rgba(255, 255, 255, 0.4);
+  padding: 40px 40px 15px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-radius: 6px;
+  font-size: 40px;
+}
+
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
