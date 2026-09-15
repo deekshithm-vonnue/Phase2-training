@@ -1,0 +1,26 @@
+.button,
+select {
+  padding: 8px 25px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+}
+
+.color-sor,
+.button {
+  background: linear-gradient(to right, #ff7e5f, #feb47b);
+}
+
+.color-clear-filter {
+  background: linear-gradient(to right, #56e701, #7edb92);
+}
+
+.color-add-issue {
+  background: linear-gradient(to right, #4603e2, #595bda);
+  color: antiquewhite;
+}
+
+.color-login {
+  background: linear-gradient(to right, #7003ff, #23259e);
+  color: white;
+}
