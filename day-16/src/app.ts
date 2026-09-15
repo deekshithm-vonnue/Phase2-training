@@ -1,0 +1,44 @@
+import express from "express";
+import helmet from "helmet";
+import cors from "cors";
+import morgan from "morgan";
+import { requestLogger } from "./middleware/requestLogger.ts";
+import { errorhandler, notFoundHandler } from "./middleware/errorhandler.ts";
+import { prisma } from "./db/prisma.ts";
+import { authRoutes } from "./module/auth/auth.routes.ts";
+import ticketRoutes from "./module/tickets/ticket.routes.ts";
+import { userRoutes } from "./module/users/user.routes.ts";
+import { rateLimter } from "./middleware/ratelimiter.middleware.ts";
+
+const app = express();
+
+app.use(helmet());
+app.use(rateLimter());
+app.use(cors());
+app.use(express.json({ limit: "1kb" }));
+app.use(morgan("dev"));
+app.use(requestLogger);
+
+app.get("/health", async (_request, response, next) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    response.json({
+      status: "ok",
+      database: "connected",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/", (_req, res) => {
+  res.send("Welcome to Home Page");
+});
+
+app.use("/api/auth", authRoutes);
+app.use("/api/tickets", ticketRoutes);
+app.use("/api/users", userRoutes);
+
+app.use(notFoundHandler);
+app.use(errorhandler);
+export default app;
