@@ -1,0 +1,34 @@
+export const STATUSES = ["OPEN", "IN_PROGRESS", "CLOSED", "RESOLVED"] as const;
+export const PRIORITIES = ["HIGH", "MEDIUM", "LOW", "URGENT"] as const;
+
+export type Status = (typeof STATUSES)[number];
+export type Priority = (typeof PRIORITIES)[number];
+export interface Ticket {
+  title: string;
+  description: string;
+  priority: Priority;
+  status: Status;
+  createdById: number;
+}
+
+export const allowedSortFields = [
+  "id",
+  "title",
+  "status",
+  "priority",
+  "createdAt",
+] as const;
+
+export type SortField = (typeof allowedSortFields)[number];
+export type SortDirection = "asc" | "desc";
+
+export interface TicketQuery {
+  page: number;
+  pageSize: number;
+  status?: Status;
+  priority?: Priority;
+  assignee?: number;
+  search?: string;
+  sortField: SortField;
+  sortDirection: SortDirection;
+}
