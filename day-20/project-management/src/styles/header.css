@@ -1,0 +1,24 @@
+.header-container {
+  position: fixed;
+  width: 100%;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 20px;
+  background-color: #121212;
+  z-index: 1;
+}
+
+.headline-content {
+  font-family: var(--sans);
+  font-size: 60px;
+  text-align: center;
+  width: 100%;
+  color: #e2e8f0;
+}
+
+.hamburger-icon {
+  font-size: 30px;
+  cursor: pointer;
+  color: #ffffff;
+}
