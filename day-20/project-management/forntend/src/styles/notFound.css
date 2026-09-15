@@ -1,0 +1,16 @@
+.not-found {
+  margin-top: 140px;
+  background-color: rgba(59, 130, 246, 0.12);
+  color: white;
+  padding-inline: 120px;
+  text-align: center;
+  font-family:
+    "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans",
+    Arial, sans-serif;
+  font-weight: 800;
+  font-size: 30px;
+}
+
+.link-to {
+  color: white;
+}
